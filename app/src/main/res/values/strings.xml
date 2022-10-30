@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">ChatApp</string>
+    <string name="title_activity_sss">sss</string>
+    <string name="title_activity_home">Home</string>
+    <string name="user_name_label">Enter User Name</string>
+    <string name="register">Register</string>
+    <string name="enter_user_name">Enter User Name</string>
+    <string name="enter_user_phone">Enter phone Number</string>
+    <string name="have_an_account">"Have an account? "</string>
+    <string name="login">login</string>
+    <string name="reqired">Required</string>
+    <string name="enter_email">Enter Your Email</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="invalid_email">Invalid Email</string>
+    <string name="invalid_password">Invalid Password</string>
+    <string name="invald_user_name">INVALID</string>
+</resources>

@@ -1,11 +1,8 @@
 package com.example.chatapp.screen.splash
 
-import android.app.admin.SystemUpdateInfo
-import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -19,9 +16,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.chatapp.R
 import com.example.chatapp.screen.authScreens.AuthViewModel
-import com.example.chatapp.utils.Screen
-import com.google.accompanist.systemuicontroller.SystemUiController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.example.chatapp.utils.sealedClasses.Screen
 
 @Composable
 fun SplashScreen(navController: NavHostController, viewModel: AuthViewModel?) {

@@ -1,4 +1,4 @@
-package com.example.chatapp.screen.authScreens.login
+package com.example.chatapp.screen.authScreens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -9,7 +9,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -17,15 +16,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.chatapp.R
-import com.example.chatapp.screen.authScreens.*
 import com.example.chatapp.ui.theme.ChatAppTheme
 import com.example.chatapp.utils.Result
-import com.example.chatapp.utils.Screen
+import com.example.chatapp.utils.sealedClasses.Screen
 import com.google.firebase.auth.FirebaseUser
 
 @Composable
@@ -46,7 +45,7 @@ fun LoginScreen(modifier: Modifier =Modifier,
                     .fillMaxWidth()
             ) {
 
-                Image(modifier = modifier, des = "login_image", image =R.drawable.register_image )
+               Image(modifier = modifier, image = R.drawable.register_image, des = "login_image")
                 UserEmailField(
                     modifier = modifier,
                     viewModel = viewModel,
@@ -57,6 +56,7 @@ fun LoginScreen(modifier: Modifier =Modifier,
                     viewModel = viewModel,
                     password = password,
                     onPasswordChange = { password = it })
+                ForgotPassword(modifier,navController)
                 LoginButton(
                     modifier = modifier,
                     viewModel = viewModel,
@@ -76,6 +76,16 @@ fun LoginScreen(modifier: Modifier =Modifier,
         ,navController,authResource)
 
 
+}
+
+@Composable
+fun ForgotPassword(modifier: Modifier,navController: NavHostController) {
+    ClickableText(text = AnnotatedString(stringResource(id = R.string.forgot_password)),
+        modifier = modifier.padding(start = 167.dp),
+        style = TextStyle(color =Color(0xFF407BFF), textDecoration = TextDecoration.Underline),
+        onClick ={
+              navController.navigate(Screen.ForgotPassword.route)
+    } )
 }
 
 @Composable
@@ -128,15 +138,6 @@ fun LoginStatus(modifier: Modifier,navController: NavHostController,authResource
 
 
 
-@Composable
-fun Image(modifier: Modifier) {
-    Image(painter = painterResource(R.drawable.register_image) ,
-        contentDescription = "login_image",
-        modifier
-            .width(200.dp)
-            .height(200.dp),
-        contentScale = ContentScale.Crop)
-}
 
 
 @Composable

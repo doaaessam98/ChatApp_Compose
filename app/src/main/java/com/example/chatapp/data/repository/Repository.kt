@@ -1,11 +1,11 @@
 package com.example.chatapp.data.repository
 
-import com.example.chatapp.data.source.IUserData
+import com.example.chatapp.data.source.remote.IUserData
 import com.example.chatapp.utils.Result
 import com.google.firebase.auth.FirebaseUser
 import javax.inject.Inject
 
-class Repository @Inject constructor(private val  userData:IUserData) :IRepository{
+class Repository @Inject constructor(private val  userData: IUserData) :IRepository{
 
 
     override val currentUser: FirebaseUser?
@@ -20,5 +20,5 @@ class Repository @Inject constructor(private val  userData:IUserData) :IReposito
 
     override fun logout() =userData.logout()
 
-
+    override suspend fun forgotPassword(email: String) :Result<Boolean> =userData.restPassword(email)
 }

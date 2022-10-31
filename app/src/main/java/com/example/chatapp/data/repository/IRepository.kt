@@ -7,5 +7,6 @@ interface IRepository {
 
     suspend fun login(email: String,password: String): Result<FirebaseUser>
     suspend fun signup(name: String,password : String,email:String): Result<FirebaseUser>
+    suspend fun forgotPassword(email: String):Result<Boolean>
     fun logout()
 }

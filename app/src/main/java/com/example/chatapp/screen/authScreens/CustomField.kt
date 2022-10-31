@@ -25,16 +25,17 @@ import androidx.compose.ui.unit.dp
 import com.example.chatapp.R
 
 @Composable
-fun Image(modifier: Modifier,des:String,image:Int) {
+fun Image(modifier: Modifier,image:Int,des:String) {
     androidx.compose.foundation.Image(
         painter = painterResource(image),
         contentDescription = des,
         modifier
             .width(200.dp)
-            .height(200.dp), contentScale = ContentScale.Crop
+            .height(200.dp),
+        contentScale = ContentScale.Crop
     )
-
 }
+
 @Composable
 fun UserEmailField(
     modifier: Modifier,
@@ -50,7 +51,6 @@ fun UserEmailField(
 
 
     Column() {
-
 
         OutlinedTextField(
             value = email,
@@ -150,7 +150,7 @@ fun ShowLoading(modifier: Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
         CircularProgressIndicator(
-            modifier = Modifier.size(100.dp),
+            modifier = Modifier.size(64.dp),
             color = Color.Gray,
         )
     }

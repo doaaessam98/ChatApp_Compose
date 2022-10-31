@@ -6,11 +6,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.chatapp.screen.authScreens.AuthViewModel
-import com.example.chatapp.screen.authScreens.login.LoginScreen
-import com.example.chatapp.screen.authScreens.register.SignupScreen
+import com.example.chatapp.screen.authScreens.ForgotPasswordScreen
+import com.example.chatapp.screen.authScreens.LoginScreen
+import com.example.chatapp.screen.authScreens.SignupScreen
 import com.example.chatapp.screen.home.HomeScreen
 import com.example.chatapp.screen.splash.SplashScreen
-import com.example.chatapp.utils.Screen
+import com.example.chatapp.utils.sealedClasses.Screen
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -46,6 +47,9 @@ fun AppNavHost(
             systemUiController.isStatusBarVisible = true
 
             HomeScreen(modifier, navController =  navController, viewModel = authViewModel)
+        }
+        composable(Screen.ForgotPassword.route) {
+            ForgotPasswordScreen(modifier, navController =  navController, viewModel = authViewModel)
         }
     }
 }

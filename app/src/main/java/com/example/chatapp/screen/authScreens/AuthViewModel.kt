@@ -2,37 +2,45 @@ package com.example.chatapp.screen.authScreens
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chatapp.R
 import com.example.chatapp.data.repository.IRepository
-import com.google.firebase.auth.FirebaseUser
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import com.example.chatapp.utils.Result
 import com.example.chatapp.utils.isEmail
-import com.example.chatapp.utils.isPassword
 import com.example.chatapp.utils.isUserName
+import com.google.firebase.auth.FirebaseUser
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 @HiltViewModel
 class AuthViewModel @Inject constructor(private val repository: IRepository,
                                           application: Application
                                         ) :AndroidViewModel(application){
 
-    private val _loginFlow = MutableStateFlow<Result<FirebaseUser>?> (null)
+    private val _loginFlow = MutableStateFlow<Result<FirebaseUser>?> (Result.Idle)
+
     val loginFlow :StateFlow<Result<FirebaseUser>?> = _loginFlow
 
-    private val _signupFlow = MutableStateFlow<Result<FirebaseUser>?> (null)
+
+    private val _signupFlow = MutableStateFlow<Result<FirebaseUser>?> (Result.Idle)
     val signupFlow :StateFlow<Result<FirebaseUser>?> = _signupFlow
+
+
+    private val _restPasswordFlow = MutableStateFlow<Result<Boolean>?> (Result.Idle)
+
+    val restPasswordFlow:StateFlow<Result<Boolean>?> = _restPasswordFlow
 
      var userNameError = MutableStateFlow("")
 
      val emailError = MutableStateFlow ("")
 
     val passwordError = MutableStateFlow("")
-   var requiredError= getApplication<Application>().getString(R.string.reqired)
+   private var requiredError= getApplication<Application>().getString(R.string.reqired)
 
 
 
@@ -69,9 +77,10 @@ class AuthViewModel @Inject constructor(private val repository: IRepository,
 
             else -> {
                 viewModelScope.launch {
-                    _loginFlow.value = Result.Loading
+                    _loginFlow.emit(Result.Loading)
                     val result = repository.login( email, password)
-                    _loginFlow.value = result
+                    _loginFlow.emit(result)
+
 
                 }
             }
@@ -106,9 +115,11 @@ class AuthViewModel @Inject constructor(private val repository: IRepository,
 //            }
             else -> {
                 viewModelScope.launch {
-                    _signupFlow.value = Result.Loading
+                    _signupFlow.emit(Result.Loading)
                     val result = repository.signup(name, email, password)
-                    _signupFlow.value = result
+                    _signupFlow.emit(result)
+                    delay(300)
+                    _signupFlow.emit(Result.Idle)
 
                 }
             }
@@ -116,7 +127,28 @@ class AuthViewModel @Inject constructor(private val repository: IRepository,
     }
 
 
+  fun forgotPassword(email: String){
+      when {
 
+
+          email.isEmpty() -> {
+              emailError.value = requiredError
+
+          }
+          !email.isEmail() -> {
+              emailError.value = getApplication<Application>().getString(R.string.enter_user_name)
+          }
+          else -> {
+              viewModelScope.launch {
+                  _restPasswordFlow.emit(Result.Loading)
+                  val result = repository.forgotPassword(email)
+                  _restPasswordFlow.emit(result)
+                  delay(300)
+                  _restPasswordFlow.emit(Result.Idle)
+              }
+          }
+      }
+  }
     fun logout() {
         repository.logout()
         _loginFlow.value = null

@@ -1,6 +1,5 @@
-package com.example.chatapp.screen.authScreens.register
+package com.example.chatapp.screen.authScreens
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
@@ -14,8 +13,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -27,11 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.chatapp.R
-import com.example.chatapp.screen.authScreens.*
 import com.example.chatapp.ui.theme.ChatAppTheme
 import com.example.chatapp.utils.Result
-import com.example.chatapp.utils.Screen
-import com.google.firebase.auth.FirebaseUser
+import com.example.chatapp.utils.sealedClasses.Screen
 
 
 @Composable
@@ -50,8 +49,8 @@ fun SignupScreen(
                 .fillMaxWidth())
     {
 
-        Image(modifier = modifier, des = "register_image", image =R.drawable.register_image )
 
+             SignupImage(modifier = modifier)
               UserNameField(modifier,  viewModel = viewModel,userName = userName, onUseNameChange = { userName=it })
 
               UserEmailField(modifier = modifier,viewModel = viewModel,email = email, onUseEmailChange ={ email=it})
@@ -65,13 +64,16 @@ fun SignupScreen(
 
 
     }
-    val authResource = viewModel?.signupFlow?.collectAsState()
-    signupStatus(modifier,authResource,navController)
+
+    SignupStatus(modifier,viewModel,navController)
 
     
 }
 @Composable
-fun signupStatus(modifier: Modifier,authResource: State<Result<FirebaseUser>?>?,navController: NavHostController) {
+fun SignupStatus(modifier: Modifier,viewModel:AuthViewModel?,navController: NavHostController) {
+    val authResource = viewModel?.signupFlow?.collectAsState()
+
+
     val context = LocalContext.current
     authResource?.value.let { result->
        when(result){
@@ -91,6 +93,7 @@ fun signupStatus(modifier: Modifier,authResource: State<Result<FirebaseUser>?>?,
                }
            }
 
+           else -> {}
        }
 
 
@@ -102,7 +105,18 @@ fun signupStatus(modifier: Modifier,authResource: State<Result<FirebaseUser>?>?,
 }
 
 
+@Composable
+fun SignupImage(modifier: Modifier) {
 
+    androidx.compose.foundation.Image(
+        painter = painterResource(R.drawable.register_image),
+        contentDescription = "register_image",
+        modifier
+            .width(200.dp)
+            .height(200.dp), contentScale = ContentScale.Crop
+    )
+
+}
 
 @Composable
 fun UserNameField(
@@ -116,7 +130,7 @@ fun UserNameField(
     val focusManager = LocalFocusManager.current
     val error =viewModel?.userNameError?.collectAsState()?.value
 
-    Column() {
+    Column {
 
         OutlinedTextField(
             value = userName,

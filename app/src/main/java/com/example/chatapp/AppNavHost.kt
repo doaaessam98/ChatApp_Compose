@@ -5,10 +5,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.chatapp.screen.authScreens.AuthViewModel
-import com.example.chatapp.screen.authScreens.ForgotPasswordScreen
-import com.example.chatapp.screen.authScreens.LoginScreen
-import com.example.chatapp.screen.authScreens.SignupScreen
+import com.example.chatapp.screen.signup.SignupViewModel
+import com.example.chatapp.screen.fogetpassword.ForgotPasswordScreen
+import com.example.chatapp.screen.signup.LoginScreen
+import com.example.chatapp.screen.signup.SignupScreen
 import com.example.chatapp.screen.home.HomeScreen
 import com.example.chatapp.screen.splash.SplashScreen
 import com.example.chatapp.utils.sealedClasses.Screen
@@ -19,7 +19,6 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    authViewModel: AuthViewModel,
     startDestination: String = Screen.Splash.route
 ) {
     val systemUiController: SystemUiController = rememberSystemUiController()
@@ -33,23 +32,23 @@ fun AppNavHost(
         composable(Screen.Splash.route) {
 
             systemUiController.isStatusBarVisible = false
-            SplashScreen(navController = navController, viewModel = authViewModel)
+            SplashScreen(navController = navController)
         }
         composable(Screen.Login.route) {
             systemUiController.isStatusBarVisible = true
 
-            LoginScreen(modifier,navController= navController, viewModel = authViewModel)
+            LoginScreen(modifier,navController= navController)
         }
         composable(Screen.Signup.route) {
-            SignupScreen(modifier=modifier,navController = navController, viewModel = authViewModel)
+            SignupScreen(modifier=modifier,navController = navController)
         }
         composable(Screen.Home.route) {
             systemUiController.isStatusBarVisible = true
 
-            HomeScreen(modifier, navController =  navController, viewModel = authViewModel)
+            HomeScreen(modifier, navController =  navController)
         }
         composable(Screen.ForgotPassword.route) {
-            ForgotPasswordScreen(modifier, navController =  navController, viewModel = authViewModel)
+            ForgotPasswordScreen(modifier, navController =  navController)
         }
     }
 }

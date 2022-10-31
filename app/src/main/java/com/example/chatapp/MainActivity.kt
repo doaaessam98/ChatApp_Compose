@@ -12,14 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.chatapp.screen.authScreens.AuthViewModel
-import com.example.chatapp.screen.splash.SplashScreen
+import com.example.chatapp.screen.signup.SignupViewModel
 import com.example.chatapp.ui.theme.ChatAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    val authViewModel:AuthViewModel by viewModels()
+    val authViewModel:SignupViewModel by viewModels()
    lateinit var navHostController: NavHostController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +30,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                    // SplashScreen()
-                AppNavHost(navController = navHostController, authViewModel = authViewModel)
+                AppNavHost(navController = navHostController)
                 }
             }
         }

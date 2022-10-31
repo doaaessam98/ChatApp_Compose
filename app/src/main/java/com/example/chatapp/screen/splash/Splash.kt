@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.airbnb.lottie.compose.LottieAnimation
@@ -15,11 +16,11 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.chatapp.R
-import com.example.chatapp.screen.authScreens.AuthViewModel
+import com.example.chatapp.screen.login.LoginViewModel
 import com.example.chatapp.utils.sealedClasses.Screen
 
 @Composable
-fun SplashScreen(navController: NavHostController, viewModel: AuthViewModel?) {
+fun SplashScreen(navController: NavHostController, viewModel: LoginViewModel? = hiltViewModel()) {
 
 
     Box(
@@ -34,7 +35,7 @@ fun SplashScreen(navController: NavHostController, viewModel: AuthViewModel?) {
             progress = { logoAnimationState.progress }
         )
         if (logoAnimationState.isAtEnd && logoAnimationState.isPlaying) {
-             if (viewModel?.currentUser!=null) {
+             if (viewModel?.currentUser !=null) {
                  navController.navigate(Screen.Home.route){
                      popUpTo(Screen.Splash.route){
                          inclusive=true

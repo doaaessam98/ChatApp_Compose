@@ -1,4 +1,4 @@
-package com.example.chatapp.screen.authScreens
+package com.example.chatapp.screen.signup
 
 import android.content.Context
 import android.widget.Toast
@@ -19,10 +19,11 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import com.example.chatapp.R
+import com.example.chatapp.model.InputField
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun Image(modifier: Modifier,image:Int,des:String) {
@@ -39,31 +40,32 @@ fun Image(modifier: Modifier,image:Int,des:String) {
 @Composable
 fun UserEmailField(
     modifier: Modifier,
-    email: TextFieldValue,
-    viewModel: AuthViewModel?,
-    onUseEmailChange: (TextFieldValue) -> Unit,
+    emailInputField: StateFlow<InputField>,
+    onEmailChanged: (String) -> Unit,
+
 
 
     ) {
     val focusManager = LocalFocusManager.current
-    val error =viewModel?.emailError?.collectAsState()?.value
+    val email =emailInputField.collectAsState()
+
 
 
 
     Column() {
 
         OutlinedTextField(
-            value = email,
+            value = email.value.input,
             onValueChange = {
-                viewModel?.emailError?.value=""
-                onUseEmailChange(it)
+             onEmailChanged(it)
             },
             label = { Text(text = stringResource(id = R.string.enter_email)) },
             maxLines = 1,
             textStyle = TextStyle(),
             leadingIcon = { Icon(imageVector = Icons.Filled.Email, contentDescription = "") },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Email),
-            isError= error!!.isNotEmpty(),
+            isError= email.value.isError,
+
             keyboardActions = KeyboardActions(onNext = {
                 focusManager.moveFocus(FocusDirection.Down) }),
             modifier = modifier.padding(top = 16.dp)
@@ -71,8 +73,8 @@ fun UserEmailField(
 
         )
     }
-    if (error!!.isNotEmpty()) {
-        Text(text = error,
+    if (email.value.isError) {
+        Text(text = email.value.errorMessage,
             style = TextStyle(color = MaterialTheme.colors.error)
         )
 
@@ -82,15 +84,13 @@ fun UserEmailField(
 @Composable
 fun passwordField(
     modifier: Modifier,
-    password: TextFieldValue,
-    viewModel:AuthViewModel?,
-    onPasswordChange: (TextFieldValue) -> Unit,
+    passwordInputField: StateFlow<InputField>,
+    onPasswordChanged: (String) -> Unit,
 
 
     ) {
     val focusManager = LocalFocusManager.current
-    val error =viewModel?.passwordError?.collectAsState()?.value
-
+    val password =passwordInputField.collectAsState()
 
     var passwordVisible by remember { mutableStateOf(false) }
     val image = if (passwordVisible)
@@ -102,9 +102,8 @@ fun passwordField(
 
         OutlinedTextField(
 
-            value = password,
-            onValueChange = { onPasswordChange(it)
-                viewModel?.passwordError?.value=""},
+            value = password.value.input,
+            onValueChange = { onPasswordChanged(it)},
             label = { Text(text = stringResource(id = R.string.enter_password)) },
             singleLine = true,
             textStyle = TextStyle(),
@@ -121,7 +120,7 @@ fun passwordField(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done
             ),
-            isError= error!!.isNotEmpty(),
+            isError= password.value.isError,
             keyboardActions = KeyboardActions(onNext = {
                 focusManager.moveFocus(FocusDirection.Down)
             }),
@@ -130,8 +129,8 @@ fun passwordField(
 
 
         )
-        if (error.isNotEmpty()){
-            Text(text = error,
+        if (password.value.isError){
+            Text(text = password.value.errorMessage,
                 style = TextStyle(color = MaterialTheme.colors.error)
             )
         }

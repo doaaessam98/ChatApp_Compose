@@ -1,4 +1,4 @@
-package com.example.chatapp.screen.authScreens
+package com.example.chatapp.screen.signup
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,22 +25,23 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.chatapp.R
+import com.example.chatapp.model.InputField
 import com.example.chatapp.ui.theme.ChatAppTheme
 import com.example.chatapp.utils.Result
 import com.example.chatapp.utils.sealedClasses.Screen
+import kotlinx.coroutines.flow.StateFlow
 
 
 @Composable
 fun SignupScreen(
     modifier: Modifier =Modifier,
-    viewModel: AuthViewModel?, navController: NavHostController
+    viewModel: SignupViewModel?= hiltViewModel(), navController: NavHostController
 ){
-    var userName by remember { mutableStateOf(TextFieldValue("")) }
-    var email by remember{ mutableStateOf(TextFieldValue("")) }
-    var password by remember{ mutableStateOf(TextFieldValue("")) }
+
 
 
 
@@ -51,13 +52,22 @@ fun SignupScreen(
 
 
              SignupImage(modifier = modifier)
-              UserNameField(modifier,  viewModel = viewModel,userName = userName, onUseNameChange = { userName=it })
+              UserNameField(modifier,
+                  nameInputField = viewModel!!.nameInput,
+                  onNameChanged = viewModel::onNameChanged
+              )
 
-              UserEmailField(modifier = modifier,viewModel = viewModel,email = email, onUseEmailChange ={ email=it})
+              UserEmailField(modifier = modifier,
+                  emailInputField = viewModel.emailInput,
+                  onEmailChanged = viewModel::onEmailChange
+              )
 
-              passwordField(modifier = modifier,viewModel = viewModel,password =password, onPasswordChange = {password=it})
+              passwordField(modifier = modifier,
+              passwordInputField = viewModel.passwordInput,
+              onPasswordChanged = viewModel::onPasswordChanged
+              )
 
-              RegisterButton(modifier = modifier, viewModel = viewModel, userName =userName.text , email =email.text , password =password.text )
+              RegisterButton(modifier = modifier, viewModel = viewModel )
 
               HaveAccountRow(modifier, navController = navController)
 
@@ -70,7 +80,7 @@ fun SignupScreen(
     
 }
 @Composable
-fun SignupStatus(modifier: Modifier,viewModel:AuthViewModel?,navController: NavHostController) {
+fun SignupStatus(modifier: Modifier, viewModel:SignupViewModel?, navController: NavHostController) {
     val authResource = viewModel?.signupFlow?.collectAsState()
 
 
@@ -121,35 +131,33 @@ fun SignupImage(modifier: Modifier) {
 @Composable
 fun UserNameField(
     modifier: Modifier,
-    viewModel: AuthViewModel?,
-    userName: TextFieldValue,
-    onUseNameChange: (TextFieldValue) -> Unit,
+    nameInputField: StateFlow<InputField>,
+    onNameChanged: (String) -> Unit,
 
 
-) {
+    ) {
     val focusManager = LocalFocusManager.current
-    val error =viewModel?.userNameError?.collectAsState()?.value
+    val name =nameInputField.collectAsState().value
 
     Column {
 
         OutlinedTextField(
-            value = userName,
-            onValueChange = { onUseNameChange(it)
-                             viewModel?.userNameError?.value=""},
+            value = name.input,
+            onValueChange = { onNameChanged(it)},
             label = { Text(text = stringResource(id = R.string.enter_user_name)) },
             maxLines = 1,
             textStyle = TextStyle(),
             leadingIcon = { Icon(imageVector = Icons.Filled.Person, contentDescription = "") },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Text),
-            isError=error!!.isNotEmpty(),
+            isError=name.isError,
             keyboardActions = KeyboardActions(onNext = {
               focusManager.moveFocus(FocusDirection.Down) }),
             modifier = modifier.padding(top = 16.dp)
 
 
         )
-        if (error.isNotEmpty()){
-            Text(text =error ,
+        if (name.isError){
+            Text(text =name.errorMessage,
             style = TextStyle(color = MaterialTheme.colors.error)
             )
         }
@@ -160,10 +168,9 @@ fun UserNameField(
 
 
 @Composable
-fun RegisterButton(modifier: Modifier,viewModel: AuthViewModel?,
-                   userName: String, email : String,password: String) {
+fun RegisterButton(modifier: Modifier, viewModel: SignupViewModel?) {
     Button(onClick = {
-        viewModel?.signupUser(userName,email,password)
+        viewModel?.signupUser()
     }, shape = RoundedCornerShape(16.dp),
         modifier = modifier
             .width(240.dp)

@@ -1,6 +1,5 @@
-package com.example.chatapp.screen.authScreens
+package com.example.chatapp.screen.signup
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
@@ -9,31 +8,29 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.chatapp.R
+import com.example.chatapp.screen.login.LoginViewModel
 import com.example.chatapp.ui.theme.ChatAppTheme
 import com.example.chatapp.utils.Result
 import com.example.chatapp.utils.sealedClasses.Screen
-import com.google.firebase.auth.FirebaseUser
+import dagger.hilt.android.lifecycle.HiltViewModel
 
 @Composable
 fun LoginScreen(modifier: Modifier =Modifier,
-                viewModel: AuthViewModel?, navController: NavHostController
+                viewModel: LoginViewModel?=hiltViewModel(), navController: NavHostController
 ) {
 
-    var email by remember { mutableStateOf(TextFieldValue("")) }
-    var password by remember { mutableStateOf(TextFieldValue("")) }
+
 
 
 
@@ -48,20 +45,19 @@ fun LoginScreen(modifier: Modifier =Modifier,
                Image(modifier = modifier, image = R.drawable.register_image, des = "login_image")
                 UserEmailField(
                     modifier = modifier,
-                    viewModel = viewModel,
-                    email = email,
-                    onUseEmailChange = { email = it })
+                    emailInputField = viewModel!!.emailInput,
+                    onEmailChanged = viewModel::onEmailChange
+
+                    )
                 passwordField(
                     modifier = modifier,
-                    viewModel = viewModel,
-                    password = password,
-                    onPasswordChange = { password = it })
+                    passwordInputField = viewModel.passwordInput,
+                    onPasswordChanged = viewModel::onPasswordChanged
+                   )
                 ForgotPassword(modifier,navController)
                 LoginButton(
                     modifier = modifier,
                     viewModel = viewModel,
-                    email = email.text,
-                    password = password.text
                 )
                 newUserRow(modifier = modifier, navController)
 
@@ -71,9 +67,9 @@ fun LoginScreen(modifier: Modifier =Modifier,
 
 
 
-    val authResource = viewModel?.loginFlow?.collectAsState()
+
     LoginStatus(modifier
-        ,navController,authResource)
+        ,navController,viewModel)
 
 
 }
@@ -88,28 +84,18 @@ fun ForgotPassword(modifier: Modifier,navController: NavHostController) {
     } )
 }
 
-@Composable
-fun LoginImage(modifier: Modifier) {
 
-    Image(
-        painter = painterResource(R.drawable.register_image),
-        contentDescription = "login_image",
-        modifier
-            .width(200.dp)
-            .height(200.dp), contentScale = ContentScale.Crop
-    )
-
-}
 
 @Composable
-fun LoginStatus(modifier: Modifier,navController: NavHostController,authResource: State<Result<FirebaseUser>?>?) {
+fun LoginStatus(modifier: Modifier,navController: NavHostController,viewModel: LoginViewModel?) {
     val context = LocalContext.current
 
-    authResource?.value.let { result->
+ val state= viewModel?.loginFlow?.collectAsState()
+     state?.value.let { result->
         when(result){
             is Result.Loading ->{
 
-    ShowLoading(modifier = modifier)
+            ShowLoading(modifier = modifier)
             }
             is Result.Failure ->{
                 ShowToast(context,message = result.exception.message.toString())
@@ -126,7 +112,8 @@ fun LoginStatus(modifier: Modifier,navController: NavHostController,authResource
                     }
                 }
             }
-            }
+            else -> {}
+        }
 
         }
 
@@ -141,9 +128,9 @@ fun LoginStatus(modifier: Modifier,navController: NavHostController,authResource
 
 
 @Composable
-fun LoginButton(modifier: Modifier,viewModel: AuthViewModel?,email: String,password:String) {
+fun LoginButton(modifier: Modifier,viewModel: LoginViewModel?) {
     Button(onClick = {
-          viewModel?.loginUser(email,password)
+          viewModel?.loginUser()
     }, shape = RoundedCornerShape(16.dp),
         modifier = modifier
             .width(240.dp)

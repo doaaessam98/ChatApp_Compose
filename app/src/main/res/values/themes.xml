@@ -2,8 +2,8 @@
 <resources>
 
     <style name="Theme.ChatApp" parent="android:Theme.Material.Light.NoActionBar" >
-     <item name="android:statusBarColor">@color/black</item>
-        <item name="android:windowBackground">@color/black</item>
+     <item name="android:statusBarColor">#407BFF</item>
+        <item name="android:windowBackground">@color/white</item>
 
 
     </style>

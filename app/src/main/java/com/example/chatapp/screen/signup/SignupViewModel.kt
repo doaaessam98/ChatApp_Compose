@@ -101,15 +101,15 @@ class SignupViewModel @Inject constructor(
 
   fun onEmailChange(newEmailValue: String){
       if(newEmailValue.isBlank()) {
-          val message = requiredError
-          _emailInput.value = emailInput.value.copy(input = newEmailValue, isError = true, errorMessage = message)
+
+          _emailInput.value = emailInput.value.copy(input = newEmailValue, isError = true, errorMessage = requiredError)
       } else {
           _emailInput.value = _emailInput.value.copy(input = newEmailValue, isError = false)
       }
   }
 
     fun onNameChanged(newNameValue: String) {
-        if(newNameValue.isNotBlank()) {
+        if(newNameValue.isBlank()) {
             _nameInput.value = nameInput.value.copy(input = newNameValue, isError = true, errorMessage = requiredError)
         } else {
             _nameInput.value = _nameInput.value.copy(input = newNameValue, isError = false)

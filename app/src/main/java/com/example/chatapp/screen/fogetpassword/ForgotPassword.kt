@@ -16,14 +16,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.chatapp.R
-import com.example.chatapp.screen.signup.Image
-import com.example.chatapp.screen.signup.ShowLoading
-import com.example.chatapp.screen.signup.ShowToast
-import com.example.chatapp.screen.signup.UserEmailField
+import com.example.chatapp.utils.CustomImage
+import com.example.chatapp.utils.ShowLoading
+import com.example.chatapp.utils.ShowToast
+import com.example.chatapp.utils.UserEmailField
 import com.example.chatapp.utils.Result
 import com.example.chatapp.utils.sealedClasses.Screen
 
@@ -38,12 +39,13 @@ fun ForgotPasswordScreen(
         topBar = {
             TopAppBar(
                 backgroundColor = Color(0xFF407BFF),
-                title = { Text(text = "Rest Password",style = TextStyle(color =Color.White)) },
+                title = { Text(text = "Rest Password",style = TextStyle(color =Color.White,fontSize = 16.sp)) },
                 navigationIcon = if (navController.previousBackStackEntry != null) {
                     {
                         IconButton(onClick = { navController.navigateUp() }) {
                             Icon(
                                 imageVector = Icons.Filled.ArrowBack,
+                                tint = Color.White         ,
                                 contentDescription = "Back"
                             )
                         }
@@ -59,7 +61,7 @@ fun ForgotPasswordScreen(
         }
     )
     
-     restPasswordState(modifier,viewModel,navController)
+     RestPasswordState(modifier,viewModel,navController)
 
 
 }
@@ -68,20 +70,24 @@ fun ScreenContent(modifier: Modifier,viewModel:ForgetPasswordViewModel){
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
-        modifier = modifier.fillMaxSize().padding(top = 32.dp)
+        modifier = modifier
+            .fillMaxSize()
+            .padding(top = 32.dp)
     ) {
 
-        Image(modifier, R.drawable.forgot_password,"forgot_password_image")
+
+
+        CustomImage(modifier, R.drawable.password,"forgot_password_image")
         UserEmailField(modifier =modifier ,
             emailInputField = viewModel.emailInput,
             onEmailChanged = viewModel::onEmailChange )
-        SentRestEmailButton(modifier = modifier, viewModel = viewModel)
+         SentRestEmailButton(modifier = modifier, viewModel = viewModel)
 
 
     }
 }
 @Composable
-fun restPasswordState(modifier: Modifier, viewModel: ForgetPasswordViewModel?, navController: NavHostController) {
+fun RestPasswordState(modifier: Modifier, viewModel: ForgetPasswordViewModel?, navController: NavHostController) {
     val context = LocalContext.current
 
     val state =viewModel?.restPasswordFlow?.collectAsState()
@@ -132,8 +138,9 @@ fun SentRestEmailButton(modifier: Modifier, viewModel: ForgetPasswordViewModel?)
             )
     ) {
 
-        androidx.compose.material.Text(
+        Text(
             text = stringResource(id = R.string.send_email),
+            style = TextStyle(color =Color.White, fontSize = 18.sp),
             modifier = modifier.padding(8.dp)
         )
 

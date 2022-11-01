@@ -1,5 +1,8 @@
 package com.example.chatapp.screen.signup
 
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,7 +23,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -28,13 +30,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.chatapp.R
 import com.example.chatapp.model.InputField
 import com.example.chatapp.ui.theme.ChatAppTheme
-import com.example.chatapp.utils.Result
+import com.example.chatapp.utils.*
 import com.example.chatapp.utils.sealedClasses.Screen
 import kotlinx.coroutines.flow.StateFlow
 
@@ -57,7 +60,11 @@ fun SignupScreen(
     {
 
 
-              Image(modifier = modifier, image = R.drawable.signup, des ="singup_image" )
+
+
+
+
+              CustomImage(modifier = modifier, image = R.drawable.signup, des ="singup_image" )
               UserNameField(modifier,
                   nameInputField = viewModel!!.nameInput,
                   onNameChanged = viewModel::onNameChanged
@@ -121,18 +128,6 @@ fun SignupStatus(modifier: Modifier, viewModel:SignupViewModel?, navController: 
 }
 
 
-@Composable
-fun SignupImage(modifier: Modifier) {
-
-    androidx.compose.foundation.Image(
-        painter = painterResource(R.drawable.login),
-        contentDescription = "register_image",
-        modifier
-            .width(200.dp)
-            .height(200.dp), contentScale = ContentScale.Crop
-    )
-
-}
 
 @Composable
 fun UserNameField(
@@ -197,7 +192,7 @@ fun RegisterButton(modifier: Modifier, viewModel: SignupViewModel?) {
         )
     ) {
 
-        Text(text = stringResource(id = R.string.register),modifier=modifier.padding(8.dp))
+        Text(text = stringResource(id = R.string.register), style = TextStyle(color =Color.White, fontSize = 18.sp),modifier=modifier.padding(8.dp))
 
     }
 }

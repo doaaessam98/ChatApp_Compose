@@ -1,8 +1,11 @@
-package com.example.chatapp.screen.signup
+package com.example.chatapp.utils
 
 import android.content.Context
+import android.content.res.Resources
+import android.media.Image
 import android.widget.Toast
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -14,10 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
@@ -26,9 +32,11 @@ import com.example.chatapp.model.InputField
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun Image(modifier: Modifier,image:Int,des:String) {
-    androidx.compose.foundation.Image(
-        painter = painterResource(image),
+fun CustomImage(modifier: Modifier, image:Int, des:String) {
+
+
+   Image(
+       painter = painterResource(image),
         contentDescription = des,
         modifier
             .width(200.dp)
@@ -37,6 +45,13 @@ fun Image(modifier: Modifier,image:Int,des:String) {
     )
 }
 
+private fun loadImageBitmapResource(res: Resources, id: Int): ImageBitmap {
+    try {
+        return ImageBitmap.imageResource(res, id)
+    } catch (throwable: Throwable) {
+        throw IllegalArgumentException(throwable.message)
+    }
+}
 @Composable
 fun UserEmailField(
     modifier: Modifier,

@@ -1,5 +1,6 @@
 package com.example.chatapp.screen.login
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -39,10 +40,12 @@ class LoginViewModel @Inject constructor(
     private val _isButtonEnable = MutableStateFlow(true)
     val isButtonEnable: StateFlow<Boolean> = _isButtonEnable
 
+
     val currentUser: FirebaseUser?
         get() = repository.currentUser
 
 
+    @SuppressLint("SuspiciousIndentation")
     fun loginUser() {
 
         val email=emailInput.value.input

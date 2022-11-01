@@ -13,7 +13,9 @@
     <string name="enter_password">Enter Password</string>
     <string name="invalid_email">Invalid Email</string>
     <string name="invalid_password">Invalid Password</string>
-    <string name="invald_user_name">INVALID</string>
+    <string name="invald_user_name">Invalid name</string>
     <string name="forgot_password">forgotpassword</string>
     <string name="send_email">Send Email</string>
+    <string name="email_example">example@gmail.com</string>
+    <string name="user_name_example">at least 5 characters</string>
 </resources>

@@ -29,6 +29,9 @@ class ForgetPasswordViewModel @Inject constructor(
 
     val restPasswordFlow:StateFlow<Result<Boolean>?> = _restPasswordFlow
 
+    private val _isButtonEnable = MutableStateFlow(true)
+    val isButtonEnable: StateFlow<Boolean> = _isButtonEnable
+
     fun forgotPassword(){
         val email = emailInput.value.input
         when {
@@ -45,10 +48,12 @@ class ForgetPasswordViewModel @Inject constructor(
 
             }
             else -> {
+                _isButtonEnable.value=false
                 viewModelScope.launch {
                     _restPasswordFlow.emit(Result.Loading)
                     val result = repository.forgotPassword(email)
                     _restPasswordFlow.emit(result)
+                    _isButtonEnable.emit(true)
                     delay(300)
                     _restPasswordFlow.emit(Result.Idle)
                 }

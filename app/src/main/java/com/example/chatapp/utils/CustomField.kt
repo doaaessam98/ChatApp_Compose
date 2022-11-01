@@ -59,7 +59,7 @@ fun UserEmailField(
             onValueChange = {
              onEmailChanged(it)
             },
-            label = { Text(text = stringResource(id = R.string.enter_email)) },
+            label = { Text(text =if(email.value.isError) stringResource(id = R.string.email_example) else stringResource(id = R.string.enter_email)) },
             maxLines = 1,
             textStyle = TextStyle(),
             leadingIcon = { Icon(imageVector = Icons.Filled.Email, contentDescription = "") },
@@ -150,7 +150,7 @@ fun ShowLoading(modifier: Modifier) {
         verticalArrangement = Arrangement.Center) {
         CircularProgressIndicator(
             modifier = Modifier.size(64.dp),
-            color = Color.Gray,
+            color = Color(0xFF407BFF),
         )
     }
 }
@@ -180,7 +180,7 @@ fun PhoneNumberField(
         OutlinedTextField(
             value = phoneNumber,
             onValueChange = { onPhoneChange(it) },
-            label = { Text(text = stringResource(id = R.string.enter_user_phone)) },
+            label = { Text(text =stringResource(id = R.string.enter_user_phone)) },
             leadingIcon = { Icon(imageVector = Icons.Filled.Call, contentDescription = "") },
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Send,

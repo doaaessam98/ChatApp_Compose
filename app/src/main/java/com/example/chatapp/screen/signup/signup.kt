@@ -1,28 +1,31 @@
 package com.example.chatapp.screen.signup
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -46,12 +49,15 @@ fun SignupScreen(
 
 
     Column(horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top, modifier = modifier
-                .fillMaxWidth())
+                verticalArrangement = Arrangement.Top,
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .fillMaxSize())
+
     {
 
 
-             SignupImage(modifier = modifier)
+              Image(modifier = modifier, image = R.drawable.signup, des ="singup_image" )
               UserNameField(modifier,
                   nameInputField = viewModel!!.nameInput,
                   onNameChanged = viewModel::onNameChanged
@@ -119,7 +125,7 @@ fun SignupStatus(modifier: Modifier, viewModel:SignupViewModel?, navController: 
 fun SignupImage(modifier: Modifier) {
 
     androidx.compose.foundation.Image(
-        painter = painterResource(R.drawable.register_image),
+        painter = painterResource(R.drawable.login),
         contentDescription = "register_image",
         modifier
             .width(200.dp)
@@ -144,7 +150,7 @@ fun UserNameField(
         OutlinedTextField(
             value = name.input,
             onValueChange = { onNameChanged(it)},
-            label = { Text(text = stringResource(id = R.string.enter_user_name)) },
+            label = { Text(text = if(name.isError)  stringResource(id = R.string.user_name_example)else stringResource(id = R.string.enter_user_name)) },
             maxLines = 1,
             textStyle = TextStyle(),
             leadingIcon = { Icon(imageVector = Icons.Filled.Person, contentDescription = "") },
@@ -167,17 +173,26 @@ fun UserNameField(
 
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RegisterButton(modifier: Modifier, viewModel: SignupViewModel?) {
+    val isEnable = viewModel?.isButtonEnable?.collectAsState()
+    val controller = LocalSoftwareKeyboardController.current
     Button(onClick = {
         viewModel?.signupUser()
-    }, shape = RoundedCornerShape(16.dp),
+        controller?.hide()
+
+    },
+        enabled = isEnable!!.value
+        ,
+        shape = RoundedCornerShape(16.dp),
         modifier = modifier
             .width(240.dp)
             .padding(top = 16.dp),
          colors = ButtonDefaults.textButtonColors(
              backgroundColor =Color(0xFF407BFF),
              contentColor = Color.White,
+
 
         )
     ) {

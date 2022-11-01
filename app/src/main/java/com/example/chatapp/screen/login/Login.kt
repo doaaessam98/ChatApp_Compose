@@ -1,5 +1,6 @@
 package com.example.chatapp.screen.signup
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
@@ -23,7 +24,6 @@ import com.example.chatapp.screen.login.LoginViewModel
 import com.example.chatapp.ui.theme.ChatAppTheme
 import com.example.chatapp.utils.Result
 import com.example.chatapp.utils.sealedClasses.Screen
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 @Composable
 fun LoginScreen(modifier: Modifier =Modifier,
@@ -42,7 +42,7 @@ fun LoginScreen(modifier: Modifier =Modifier,
                     .fillMaxWidth()
             ) {
 
-               Image(modifier = modifier, image = R.drawable.register_image, des = "login_image")
+               Image(modifier = modifier, image = R.drawable.login, des = "login_image")
                 UserEmailField(
                     modifier = modifier,
                     emailInputField = viewModel!!.emailInput,
@@ -86,6 +86,7 @@ fun ForgotPassword(modifier: Modifier,navController: NavHostController) {
 
 
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun LoginStatus(modifier: Modifier,navController: NavHostController,viewModel: LoginViewModel?) {
     val context = LocalContext.current
@@ -129,9 +130,13 @@ fun LoginStatus(modifier: Modifier,navController: NavHostController,viewModel: L
 
 @Composable
 fun LoginButton(modifier: Modifier,viewModel: LoginViewModel?) {
+    val isEnable = viewModel?.isButtonEnable?.collectAsState()
+
     Button(onClick = {
           viewModel?.loginUser()
-    }, shape = RoundedCornerShape(16.dp),
+    },
+        enabled = isEnable!!.value,
+        shape = RoundedCornerShape(16.dp),
         modifier = modifier
             .width(240.dp)
             .padding(top = 16.dp),

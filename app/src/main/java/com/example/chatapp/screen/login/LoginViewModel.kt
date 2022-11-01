@@ -12,6 +12,7 @@ import com.example.chatapp.utils.isPassword
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -35,15 +36,17 @@ class LoginViewModel @Inject constructor(
 
     private var requiredError= context.getString(R.string.reqired)
 
+    private val _isButtonEnable = MutableStateFlow(true)
+    val isButtonEnable: StateFlow<Boolean> = _isButtonEnable
 
     val currentUser: FirebaseUser?
         get() = repository.currentUser
 
 
     fun loginUser() {
-        val  email =emailInput.value.input
-        val password =passwordInput.value.input
-        viewModelScope.launch {
+
+        val email=emailInput.value.input
+        val  password=passwordInput.value.input
             when {
 
                 email.isEmpty() -> {
@@ -63,19 +66,21 @@ class LoginViewModel @Inject constructor(
 
 //            !password.isPassword()->{
 //              val error =context.getString(R.string.invalid_password)
-      //          _passwordInput.value =emailInput.value.copy(isError=true,errorMessage = error)
-        //   }
+//                _passwordInput.value =emailInput.value.copy(isError=true,errorMessage = error)
+//           }
 
                 else -> {
+                    _isButtonEnable.value=false
                     viewModelScope.launch {
                         _loginFlow.emit(Result.Loading)
                         val result = repository.login(email, password)
                         _loginFlow.emit(result)
-
-
+                        _isButtonEnable.emit(true)
+                        delay(300)
+                        _loginFlow.emit(Result.Idle)
                     }
                 }
-            }
+
         }
     }
 

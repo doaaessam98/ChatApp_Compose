@@ -24,6 +24,7 @@ class SignupViewModel @Inject constructor(
      ) :AndroidViewModel(application){
 
 
+
     private val _emailInput = MutableStateFlow(InputField())
     val emailInput: StateFlow<InputField> = _emailInput
 
@@ -38,7 +39,8 @@ class SignupViewModel @Inject constructor(
     val signupFlow :StateFlow<Result<FirebaseUser>?> = _signupFlow
 
 
-
+    private val _isButtonEnable = MutableStateFlow(true)
+    val isButtonEnable: StateFlow<Boolean> = _isButtonEnable
 
 
    private var requiredError= getApplication<Application>().getString(R.string.reqired)
@@ -79,10 +81,13 @@ class SignupViewModel @Inject constructor(
             //   }
 
             else -> {
+
                 viewModelScope.launch {
+                    _isButtonEnable.emit(false)
                     _signupFlow.emit(Result.Loading)
                     val result = repository.signup(name, email, password)
                     _signupFlow.emit(result)
+                    _isButtonEnable.emit(true)
                     delay(300)
                     _signupFlow.emit(Result.Idle)
 
@@ -108,9 +113,9 @@ class SignupViewModel @Inject constructor(
             _nameInput.value = nameInput.value.copy(input = newNameValue, isError = true, errorMessage = requiredError)
         } else {
             _nameInput.value = _nameInput.value.copy(input = newNameValue, isError = false)
-        }
 
-    }
+
+    }}
 
 
     fun onPasswordChanged(newPasswordValue: String) {
@@ -124,7 +129,7 @@ class SignupViewModel @Inject constructor(
 //                          _passwordInput.value =emailInput.value.copy(isError=true,errorMessage = error)
 //           }
             else -> {
-                _passwordInput.value = passwordInput.value.copy(input = newPasswordValue, isError = false)
+                _passwordInput.value = _passwordInput.value.copy(input = newPasswordValue, isError = false)
             }
         }
 

@@ -70,7 +70,7 @@ import com.example.chatapp.utils.ShowLoading
                       users=response.result
                  }
          }
-             Box {
+             Box (modifier.fillMaxSize()){
                  if (users.isNotEmpty()){
                   LazyColumn(){
                       itemsIndexed(users){position,user->

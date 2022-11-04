@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.chatapp.graphs.RootNavigationGraph
 import com.example.chatapp.screen.signup.SignupViewModel
 import com.example.chatapp.ui.theme.ChatAppTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,8 +30,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                   // SplashScreen()
-                AppNavHost(navController = navHostController)
+
+                RootNavigationGraph(navController = navHostController)
                 }
             }
         }

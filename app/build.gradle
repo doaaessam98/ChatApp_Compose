@@ -11,12 +11,12 @@ plugins {
 
 android {
     namespace 'com.example.chatapp'
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.example.chatapp"
         minSdk 21
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -106,6 +106,7 @@ dependencies {
     def nav_version = "2.5.2"
 
     implementation("androidx.navigation:navigation-compose:$nav_version")
+    implementation "androidx.compose.material:material:1.4.0-alpha01"
 
  //lottie
     implementation 'com.airbnb.android:lottie-compose:5.2.0'

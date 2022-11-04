@@ -1,7 +1,6 @@
 package com.example.chatapp.screen.signup
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
@@ -10,9 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -24,10 +21,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.chatapp.R
+import com.example.chatapp.graphs.AuthScreen
+import com.example.chatapp.graphs.Graph
 import com.example.chatapp.screen.login.LoginViewModel
 import com.example.chatapp.ui.theme.ChatAppTheme
 import com.example.chatapp.utils.*
-import com.example.chatapp.utils.sealedClasses.Screen
 
 @Composable
 fun LoginScreen(modifier: Modifier =Modifier,
@@ -81,7 +79,7 @@ fun ForgotPassword(modifier: Modifier,navController: NavHostController) {
         modifier = modifier.padding(start = 167.dp),
         style = TextStyle(color =Color(0xFF407BFF), textDecoration = TextDecoration.Underline),
         onClick ={
-              navController.navigate(Screen.ForgotPassword.route)
+              navController.navigate(AuthScreen.ForgotPassword.route)
     } )
 }
 
@@ -105,8 +103,8 @@ fun LoginStatus(modifier: Modifier,navController: NavHostController,viewModel: L
             }
             is Result.Success -> {
                 LaunchedEffect(Unit) {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Login.route) {
+                    navController.navigate(Graph.HOME) {
+                        popUpTo(AuthScreen.Login.route) {
                             inclusive = true
 
 
@@ -161,8 +159,8 @@ fun newUserRow(modifier: Modifier,navController: NavHostController) {
         ClickableText(text = AnnotatedString(stringResource(id = R.string.register)),
             style = TextStyle(color =Color(0xFF407BFF))  ,
             onClick = {
-                navController.navigate(Screen.Signup.route) {
-                    popUpTo(Screen.Login.route) { inclusive = true }
+                navController.navigate(AuthScreen.Signup.route) {
+                    popUpTo(AuthScreen.Login.route) { inclusive = true }
                 }
             })
 

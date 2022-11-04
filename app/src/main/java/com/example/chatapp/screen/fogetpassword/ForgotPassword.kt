@@ -1,5 +1,6 @@
 package com.example.chatapp.screen.fogetpassword
 
+import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.compose.foundation.layout.*
@@ -21,14 +22,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.chatapp.R
+import com.example.chatapp.graphs.AuthScreen
 import com.example.chatapp.utils.CustomImage
 import com.example.chatapp.utils.ShowLoading
 import com.example.chatapp.utils.ShowToast
 import com.example.chatapp.utils.UserEmailField
 import com.example.chatapp.utils.Result
-import com.example.chatapp.utils.sealedClasses.Screen
 
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ForgotPasswordScreen(
     modifier: Modifier,
@@ -106,7 +108,7 @@ fun RestPasswordState(modifier: Modifier, viewModel: ForgetPasswordViewModel?, n
                         Log.e(TAG, "restPasswordState: Success${result.result}", )
                         LaunchedEffect(Unit) {
                             navController.popBackStack()
-                            navController.navigate(Screen.Login.route)
+                            navController.navigate(AuthScreen.Login.route)
                         }
                     }
                 }

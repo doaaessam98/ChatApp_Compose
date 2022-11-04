@@ -18,4 +18,16 @@
     <string name="send_email">Send Email</string>
     <string name="email_example">example@gmail.com</string>
     <string name="user_name_example">at least 5 characters</string>
+    <string name="chats">Chats</string>
+    <string name="groups">Groups</string>
+    <string name="friends">Friends</string>
+    <string name="search">Search</string>
+    <string name="profile">profile</string>
+    <string name="start_chat">Start Chat</string>
+    <string name="back">back</string>
+    <string name="search_title">Search...</string>
+    <string name="search_too_short"> search too short</string>
+    <string name="search_profile_image_description">profile Image</string>
+    <string name="add_friend_description">add Friend</string>
+
 </resources>

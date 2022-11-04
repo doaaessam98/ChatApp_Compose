@@ -1,8 +1,5 @@
 package com.example.chatapp.screen.signup
 
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,7 +16,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -35,10 +31,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.chatapp.R
+import com.example.chatapp.graphs.AuthScreen
+import com.example.chatapp.graphs.Graph
 import com.example.chatapp.model.InputField
 import com.example.chatapp.ui.theme.ChatAppTheme
 import com.example.chatapp.utils.*
-import com.example.chatapp.utils.sealedClasses.Screen
 import kotlinx.coroutines.flow.StateFlow
 
 
@@ -108,8 +105,8 @@ fun SignupStatus(modifier: Modifier, viewModel:SignupViewModel?, navController: 
            }
            is Result.Success -> {
                LaunchedEffect(Unit) {
-                   navController.navigate(Screen.Home.route) {
-                       popUpTo(Screen.Signup.route) {
+                   navController.navigate(Graph.HOME) {
+                       popUpTo(AuthScreen.Signup.route) {
                            inclusive = true
                        }
                    }
@@ -202,8 +199,8 @@ fun HaveAccountRow(modifier: Modifier,navController: NavHostController) {
         Text(text = stringResource(id = R.string.have_an_account) )
         ClickableText(text = AnnotatedString(stringResource(id = R.string.login)),
             style = TextStyle(color =Color(0xFF407BFF))  , onClick = {
-                navController.navigate(Screen.Login.route){
-                    popUpTo(Screen.Login.route){
+                navController.navigate(AuthScreen.Login.route){
+                    popUpTo(AuthScreen.Login.route){
                         inclusive=true
                     }
                 }

@@ -16,8 +16,10 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.chatapp.R
+import com.example.chatapp.graphs.AuthScreen
+import com.example.chatapp.graphs.Graph
 import com.example.chatapp.screen.login.LoginViewModel
-import com.example.chatapp.utils.sealedClasses.Screen
+
 
 @Composable
 fun SplashScreen(navController: NavHostController, viewModel: LoginViewModel? = hiltViewModel()) {
@@ -36,15 +38,15 @@ fun SplashScreen(navController: NavHostController, viewModel: LoginViewModel? = 
         )
         if (logoAnimationState.isAtEnd && logoAnimationState.isPlaying) {
              if (viewModel?.currentUser !=null) {
-                 navController.navigate(Screen.Home.route){
-                     popUpTo(Screen.Splash.route){
+                 navController.navigate(Graph.HOME){
+                     popUpTo(AuthScreen.Splash.route){
                          inclusive=true
                      }
                  }
              }
             else{
-                 navController.navigate(Screen.Login.route){
-                     popUpTo(Screen.Splash.route){
+                 navController.navigate(AuthScreen.Login.route){
+                     popUpTo(AuthScreen.Splash.route){
                          inclusive=true
                      }
                  }

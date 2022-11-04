@@ -1,6 +1,8 @@
 package com.example.chatapp.screen.signup
 
 import android.app.Application
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chatapp.R
@@ -81,7 +83,6 @@ class SignupViewModel @Inject constructor(
             //   }
 
             else -> {
-
                 viewModelScope.launch {
                     _isButtonEnable.emit(false)
                     _signupFlow.emit(Result.Loading)

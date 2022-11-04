@@ -1,6 +1,7 @@
 package com.example.chatapp.data.source.remote
 
-import com.example.chatapp.data.source.remote.IUserData
+import android.content.ContentValues.TAG
+import android.util.Log
 import com.example.chatapp.model.User
 import com.example.chatapp.utils.Constants
 import com.example.chatapp.utils.Result
@@ -9,6 +10,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.ktx.Firebase
 import javax.inject.Inject
 
@@ -21,29 +23,34 @@ class UserData @Inject constructor(
 
     override val currentUser: FirebaseUser?
         get() = firebaseAuth.currentUser
-    override suspend fun login(email: String,password: String): Result<FirebaseUser> {
+
+    override suspend fun login(email: String, password: String): Result<FirebaseUser> {
         return try {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
 
-            Result .Success(result.user!!)
+            Result.Success(result.user!!)
         } catch (e: Exception) {
             e.printStackTrace()
-           Result.Failure(e)
+            Result.Failure(e)
         }
     }
 
-    override suspend fun signup(name: String, password: String,email:String): Result<FirebaseUser> {
+    override suspend fun signup(
+        name: String,
+        password: String,
+        email: String
+    ): Result<FirebaseUser> {
         return try {
             val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
-            result.user?.updateProfile(UserProfileChangeRequest.Builder().setDisplayName(name).build())?.await()
-            result.user?.sendEmailVerification()
+            result.user?.updateProfile(
+                UserProfileChangeRequest.Builder().setDisplayName(name).build()
+            )?.await()
+            //result.user?.sendEmailVerification()
             addUserToDatabase(result.user!!).await()
-
-
-            return Result.Success(result.user!!)
+            Result.Success(result.user!!)
         } catch (e: Exception) {
             e.printStackTrace()
-           Result.Failure(e)
+            Result.Failure(e)
         }
     }
 
@@ -57,18 +64,20 @@ class UserData @Inject constructor(
     }
 
     private fun firebaseUserToUser(firebaseUser: FirebaseUser): User {
-        return User(id = "", name = firebaseUser.displayName!!, email = firebaseUser.email!!)
+        return User(
+            id = firebaseUser.uid,
+            name = firebaseUser.displayName!!,
+            email = firebaseUser.email!!
+        )
     }
 
-   override  suspend fun restPassword(email:String):Result<Boolean>{
-      return  try {
+    override suspend fun restPassword(email: String): Result<Boolean> {
+        return try {
             Firebase.auth.sendPasswordResetEmail(email).await()
-             Result.Success(true)
-        }catch (e:Exception){
-           Result.Failure(e)
+            Result.Success(true)
+        } catch (e: Exception) {
+            Result.Failure(e)
         }
-
-
 
 
     }
@@ -77,4 +86,44 @@ class UserData @Inject constructor(
         firebaseAuth.signOut()
     }
 
+    override suspend fun getUsers(): Task<QuerySnapshot> {
+        return firestore
+            .collection(Constants.USER_COLLECTION)
+            .get()
+
+
+    }
+
+    override suspend fun addFriend(currentUser: User,userFriendId: String): Task<Void>? {
+
+
+        if (currentUser.friends.contains(userFriendId)) {
+            return null
+        }
+        val updateUserFriends = currentUser.friends.plus(userFriendId)
+        return firestore.collection(Constants.USER_COLLECTION)
+            .document(currentUser.id).update(Constants.USER_FRIENDS, updateUserFriends)
+    }
+
+    override suspend fun getCurrentUser(): Task<QuerySnapshot> {
+        val uid = currentUser!!.uid
+
+       return  firestore
+            .collection(Constants.USER_COLLECTION)
+            .whereEqualTo("id", uid)
+            .get()
+
+    }
+
+
+    override fun isFriendOf(currentUser: User, otherUser: User): Boolean {
+
+        for(UserId in currentUser.friends) {
+            if(UserId==otherUser.id) {
+                return true
+            }
+        }
+        return false
+
+    }
 }

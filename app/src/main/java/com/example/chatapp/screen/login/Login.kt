@@ -32,8 +32,7 @@ fun LoginScreen(modifier: Modifier =Modifier,
                 viewModel: LoginViewModel?=hiltViewModel(), navController: NavHostController
 ) {
 
-    Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+    Column(horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
                 modifier = modifier
                     .fillMaxWidth()

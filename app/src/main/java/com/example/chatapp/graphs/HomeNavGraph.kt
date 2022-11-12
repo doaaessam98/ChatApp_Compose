@@ -30,7 +30,7 @@ fun HomeNavGraph(modifier:Modifier,navController:NavHostController){
 
 
         composable(route= HomeNavigationItem.Groups.route){
-            GroupsScreen(modifier = modifier, navHostController = navController)
+            GroupsScreen(modifier = modifier, navController = navController)
         }
         composable(route= HomeNavigationItem.Friends.route){
             FriendsScreen(modifier = modifier, navController = navController)

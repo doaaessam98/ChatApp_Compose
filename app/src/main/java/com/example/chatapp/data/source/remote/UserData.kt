@@ -94,7 +94,7 @@ class UserData @Inject constructor(
 
     }
 
-    override suspend fun addFriend(currentUser: User,userFriendId: String): Task<Void>? {
+    override suspend fun addFriend(currentUser: User, userFriendId: String): Task<Void>? {
 
 
         if (currentUser.friends.contains(userFriendId)) {
@@ -125,5 +125,24 @@ class UserData @Inject constructor(
         }
         return false
 
+    }
+
+    override suspend fun getAllFriends(friendsIds: List<String>): Task<QuerySnapshot> {
+        Log.e(TAG, "getAllFriends: ${firestore
+            .collection(Constants.USER_COLLECTION)
+            .whereIn(Constants.USER_UID, friendsIds)
+            .get()}", )
+        return firestore
+            .collection(Constants.USER_COLLECTION)
+            .whereIn(Constants.USER_UID, friendsIds)
+            .get()
+    }
+    override suspend  fun removeFriend(user: User, friendId: String): Task<Void>? {
+
+        val newFriends = user.friends - friendId
+        return firestore
+            .collection(Constants.USER_COLLECTION)
+            .document(user.id)
+            .update(Constants.USER_FRIENDS, newFriends)
     }
 }

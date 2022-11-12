@@ -1,11 +1,12 @@
 package com.example.chatapp.utils
 
 object Constants {
-   const val PROFILE_PICTURE_SIZE = 50
+    var FRIENDS_LIST: ArrayList<String> =ArrayList()
+    const val PROFILE_PICTURE_SIZE = 45
 
     const val USER_FRIENDS ="friends"
     const val USER_COLLECTION = "users"
-    const val USER_UID = "uid"
+    const val USER_UID = "id"
 }
 
 object NameLimits {

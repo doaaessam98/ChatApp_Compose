@@ -6,6 +6,7 @@ import com.example.chatapp.data.source.remote.IUserData
 import com.example.chatapp.model.User
 import com.example.chatapp.utils.Result
 import com.example.chatapp.utils.await
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import javax.inject.Inject
 
@@ -31,6 +32,7 @@ class Repository @Inject constructor(private val  userData: IUserData) :IReposit
              val result = userData.getCurrentUser().await()
 
              val user= result.toObjects(User::class.java)[0]
+             // Constants.FRIENDS_LIST = user.friends as ArrayList<String>
               Result.Success(user)
         }catch (e:Exception){
 
@@ -43,18 +45,12 @@ class Repository @Inject constructor(private val  userData: IUserData) :IReposit
 
         return try {
             val users = userData.getUsers().await()
-            Log.e(TAG, "searchForUser: ${users.size()}", )
-
-                val usersObjects = users.toObjects(User::class.java)
-            Log.e(TAG, "searchForUser2: ${usersObjects.get(0)}", )
-
+            val usersObjects = users.toObjects(User::class.java)
             val allUser = usersObjects.filter { user ->
                     user.name.contains(searchString.trim(), ignoreCase = true)&&(user.id!=currentUser!!.uid)
 
+            }
 
-                }
-            Log.e(TAG, "searchForUser: ${allUser.size}", )
-            Log.e(TAG, "searchForUser: ${allUser.size}", )
                 Result.Success(allUser)
 
 
@@ -67,7 +63,10 @@ class Repository @Inject constructor(private val  userData: IUserData) :IReposit
     override suspend fun addFriend(currentUser: User,userFriendId: String):Result<Void?>{
         return  try {
             val result= userData.addFriend(currentUser,userFriendId)?.await()
-            Result.Success(result)
+
+            //  Constants.FRIENDS_LIST.add(userFriendId)
+
+              Result.Success(result)
 
         }catch (e:Exception){
            Result.Failure(e)
@@ -76,6 +75,38 @@ class Repository @Inject constructor(private val  userData: IUserData) :IReposit
     }
 
     override fun isFriendOf(currentUser: User, otherUser: User): Boolean =userData.isFriendOf(currentUser,otherUser)
+    override suspend fun getAllFriends(): Result<List<User>> {
+       return try {
+               val currentUser = userData.getCurrentUser().await()
+               val user= currentUser.toObjects(User::class.java)[0]
+               if(user.friends.isNotEmpty()){
+                   Log.e(TAG, "getAllFriends: ${user.friends}", )
+               val result = userData.getAllFriends(user.friends).await()
+                   Log.e(TAG, "getAllFriends: ${result.documents}", )
+                   val friends = result.toObjects(User::class.java)
+                   Log.e(TAG, "getAllFriends: $friends", )
+                   Result.Success(friends)
+               }else{
+                   Result.Success(listOf())
+               }
 
+
+        }catch (e:Exception){
+           Log.e(TAG, "getAllFriends: $e", )
+           Result.Failure(e)
+        }
+
+    }
+
+    override suspend fun removeFriend(friendId: String):Result<Void?> {
+      return try {
+          val currentUser = userData.getCurrentUser().await()
+          val user = currentUser.toObjects(User::class.java)[0]
+          val removeResult = userData.removeFriend(user, friendId)
+          Result.Success(removeResult?.result )
+      }catch (e:Exception){
+         Result.Failure(e)
+      }
+    }
 }
 

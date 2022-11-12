@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -42,7 +43,7 @@ import com.example.chatapp.utils.ShowLoading
     @Composable
     fun SearchScreen(modifier: Modifier,viewModel: SearchViewModel= hiltViewModel(),navController: NavHostController){
        Scaffold(
-           topBar = {SearchTopBar(modifier,viewModel)}
+           topBar = {SearchTopBar(modifier,viewModel,navController)}
        ) {contentPadding->
 
            SearchBody(modifier, viewModel)
@@ -73,7 +74,7 @@ import com.example.chatapp.utils.ShowLoading
              Box (modifier.fillMaxSize()){
                  if (users.isNotEmpty()){
                   LazyColumn(){
-                      itemsIndexed(users){position,user->
+                      items(users){user->
 
                           val isFriend = remember(user) { mutableStateOf(viewModel.isFriendOf(user)) }
 
@@ -111,11 +112,16 @@ import com.example.chatapp.utils.ShowLoading
         profilePicture: Bitmap?
     ) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier.fillMaxWidth().padding(4.dp)
                 .clickable { onSearchResultClicked.invoke(user.id) },
-        ) {
-            Box(modifier = Modifier.fillMaxWidth()) {
+        )
+        {
+
+
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+
 
                 Row(
                     horizontalArrangement = Arrangement.Start,
@@ -129,55 +135,55 @@ import com.example.chatapp.utils.ShowLoading
                         if(profilePicture!=null) {
                             ProfilePicture(picture = profilePicture, name = user.name)
                         } else {
-                            DefaultProfilePicture(name = user.name)
+                            DefaultProfilePicture(modifier, name = user.name)
                         }
                     }
 
                     Text(
                         text = user.name,
-                        style = MaterialTheme.typography.h6,
+                        style = MaterialTheme.typography.subtitle1,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
 
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                when {
+                    isFriend.value -> {
+                        Log.e(TAG, "SearchContent: add to friend ",)
 
+                    }
+                    else -> {
 
-                        )}
-                    Row(modifier = modifier
-                        .align(CenterEnd)
-                        .padding(16.dp)) {
-                        when {
-                            isFriend.value -> {
-                                Log.e(TAG, "SearchContent: add to friend ",)
-
-                            }
-                            else -> {
-
-                                IconButton(onClick = { onAddAsContactClicked.invoke(user.id, isFriend) })
-                                {
-                                    Icon(
-                                        imageVector = Icons.Default.PersonAdd,
-                                        contentDescription = stringResource(id = R.string.add_friend_description)
-                                    )
-                                }
-
-                            }
+                        IconButton(
+                            onClick = { onAddAsContactClicked.invoke(user.id, isFriend) },
+                            modifier.align(Alignment.CenterEnd)
+                        )
+                        {
+                            Icon(
+                                imageVector = Icons.Default.PersonAdd,
+                                contentDescription = stringResource(id = R.string.add_friend_description)
+                            )
                         }
+
                     }
                 }
             }
+        }
 
     }
 
 
 
 
+
     @Composable
-    fun SearchTopBar(modifier: Modifier,viewModel: SearchViewModel) {
+    fun SearchTopBar(modifier: Modifier,viewModel: SearchViewModel,navController: NavHostController) {
         TopAppBar(
             backgroundColor = Color(0xFF407BFF),
             navigationIcon = {
-                IconButton(onClick = { onBackClicked() }) {
+                IconButton(onClick = { onBackClicked(navController =navController ) }) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
+                         tint = Color.White,
                         contentDescription = stringResource(id = R.string.back)
                     )
                 }
@@ -215,7 +221,7 @@ import com.example.chatapp.utils.ShowLoading
                     )
                 },
                 textStyle = TextStyle(
-                    fontSize = MaterialTheme.typography.subtitle1.fontSize
+                    fontSize = MaterialTheme.typography.subtitle1.fontSize, color = Color.White
                 ),
                 singleLine = true,
                 trailingIcon = {
@@ -240,6 +246,7 @@ import com.example.chatapp.utils.ShowLoading
 
                     }
                 ),
+
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.Transparent,
                     cursorColor = Color.White.copy(alpha = ContentAlpha.medium)
@@ -247,7 +254,8 @@ import com.example.chatapp.utils.ShowLoading
         }
 
     }
-    fun onBackClicked() {
+    fun onBackClicked(navController: NavHostController) {
+        navController.popBackStack()
 
     }
 

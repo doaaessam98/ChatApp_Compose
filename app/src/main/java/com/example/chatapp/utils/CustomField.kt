@@ -2,31 +2,45 @@ package com.example.chatapp.utils
 
 import android.content.Context
 import android.content.res.Resources
-import android.media.Image
+import android.os.Build.VERSION.SDK_INT
 import android.widget.Toast
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.*
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import coil.request.ImageRequest
+import coil.size.Size.Companion.ORIGINAL
 import com.example.chatapp.R
 import com.example.chatapp.model.InputField
 import kotlinx.coroutines.flow.StateFlow
@@ -38,9 +52,9 @@ fun CustomImage(modifier: Modifier, image:Int, des:String) {
    Image(
        painter = painterResource(image),
         contentDescription = des,
-        modifier
-            .width(200.dp)
-            .height(200.dp),
+       modifier
+           .width(200.dp)
+           .height(200.dp),
         contentScale = ContentScale.Crop
     )
 }
@@ -57,9 +71,6 @@ fun UserEmailField(
     modifier: Modifier,
     emailInputField: StateFlow<InputField>,
     onEmailChanged: (String) -> Unit,
-
-
-
     ) {
     val focusManager = LocalFocusManager.current
     val email =emailInputField.collectAsState()
@@ -101,8 +112,6 @@ fun passwordField(
     modifier: Modifier,
     passwordInputField: StateFlow<InputField>,
     onPasswordChanged: (String) -> Unit,
-
-
     ) {
     val focusManager = LocalFocusManager.current
     val password =passwordInputField.collectAsState()
@@ -180,6 +189,48 @@ private fun CircularProgressAnimated(){
         targetValue = progressValue,animationSpec = infiniteRepeatable(animation = tween(900)))
 
     CircularProgressIndicator(progress = progressAnimationValue)
+}
+
+@Composable
+fun FloatingButton(modifier: Modifier, icon: ImageVector, onClick:()->Unit) {
+    FloatingActionButton(onClick = {onClick()}, contentColor = Color.White,
+        backgroundColor = Color(0xFF407BFF)
+    ) {
+         Icon(imageVector = icon, contentDescription = "")
+    }
+}
+@Preview(showBackground = true)
+@Composable
+fun PreviewButton(){
+   // FloatingButton(modifier = Modifier, icon = Icons.Default.PersonAdd) { }
+    GifImage()
+}
+
+@Composable
+fun GifImage(
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    val imageLoader = ImageLoader.Builder(context)
+        .components {
+            if (SDK_INT >= 28) {
+                add(ImageDecoderDecoder.Factory())
+            } else {
+                add(GifDecoder.Factory())
+            }
+        }
+        .build()
+    Image(
+        painter = rememberAsyncImagePainter(
+            ImageRequest.Builder(context).data(data = R.drawable.empty_friends_list).apply(block = {
+                size(ORIGINAL)
+
+            }).build(), imageLoader = imageLoader,
+
+        ),
+        contentDescription = null,
+        modifier = modifier.fillMaxWidth(),
+    )
 }
 
 

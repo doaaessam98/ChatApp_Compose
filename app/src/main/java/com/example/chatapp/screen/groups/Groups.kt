@@ -23,14 +23,13 @@ import androidx.navigation.NavHostController
 import com.example.chatapp.R
 import com.example.chatapp.graphs.CreateGroupScreen
 import com.example.chatapp.model.Group
+import com.example.chatapp.model.User
 import com.example.chatapp.utils.*
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun GroupsScreen(modifier: Modifier,navController: NavHostController ,viewModel: GroupViewModel= hiltViewModel() ){
 
-    val groupsState = viewModel.userGroups.collectAsState().value
-    var groupsList = remember { mutableStateOf(listOf<Group>())}
 
     Scaffold(
         floatingActionButton = {
@@ -41,24 +40,21 @@ fun GroupsScreen(modifier: Modifier,navController: NavHostController ,viewModel:
         floatingActionButtonPosition = FabPosition.End
     ) { paddintContent->
 
-
-        GetGroupsState(modifier,groupsState){
-              groupsList.value= it
-
-        }
-        GroupsScreenContent(modifier,groupsList.value,viewModel::onGroupClicked,viewModel::onRemoveClicked)
+        GroupsScreenContent(modifier,viewModel)
 
     }
 
 }
 @Composable
-fun GetGroupsState(modifier: Modifier, groupsState: Result<List<Group>>,onSuccess:(List<Group>)->Unit) {
+fun GetGroupsState(modifier: Modifier,viewModel: GroupViewModel,onSuccess:(List<Group>)->Unit,onLoading:(Boolean)->Unit) {
     val context = LocalContext.current
+    val groupsState = viewModel.userGroups.collectAsState().value
+
     groupsState.let { response ->
         when (response) {
             is Result.Loading -> {
                 ShowLoading(modifier = modifier)
-
+                onLoading.invoke(true)
             }
             is Result.Failure -> {
                 response.exception.localizedMessage?.let {
@@ -78,12 +74,20 @@ fun GetGroupsState(modifier: Modifier, groupsState: Result<List<Group>>,onSucces
     }
 }
 @Composable
-fun GroupsScreenContent(modifier: Modifier, groups: List<Group> ,onGroupClick:(String)->Unit,
-                        onRemoveClicked:(String)->Unit) {
-
+fun GroupsScreenContent(modifier: Modifier,viewModel: GroupViewModel) {
+    var groups = remember { mutableStateOf(listOf<Group>())}
+    var loading by remember { mutableStateOf(false) }
+    GetGroupsState(modifier = modifier, viewModel = viewModel,
+      onSuccess = {  groups.value = it}, onLoading ={loading=it} )
+    if(groups.value.isNotEmpty()&& loading){
     LazyColumn(){
-        items(groups){group->
-            GroupItemContent(modifier,group,onGroupClick,onRemoveClicked)
+        items(groups.value){group->
+            GroupItemContent(modifier,group,viewModel::onGroupClicked,viewModel::onRemoveClicked)
+        }
+    }
+    }else{
+        if(loading){
+            // handel empty list
         }
     }
 }

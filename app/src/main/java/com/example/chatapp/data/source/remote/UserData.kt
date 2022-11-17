@@ -2,6 +2,8 @@ package com.example.chatapp.data.source.remote
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import com.example.chatapp.model.Group
+import com.example.chatapp.model.GroupMember
 import com.example.chatapp.model.User
 import com.example.chatapp.utils.Constants
 import com.example.chatapp.utils.Result
@@ -12,6 +14,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.ktx.Firebase
+import java.util.*
 import javax.inject.Inject
 
 
@@ -128,10 +131,7 @@ class UserData @Inject constructor(
     }
 
     override suspend fun getAllFriends(friendsIds: List<String>): Task<QuerySnapshot> {
-        Log.e(TAG, "getAllFriends: ${firestore
-            .collection(Constants.USER_COLLECTION)
-            .whereIn(Constants.USER_UID, friendsIds)
-            .get()}", )
+
         return firestore
             .collection(Constants.USER_COLLECTION)
             .whereIn(Constants.USER_UID, friendsIds)
@@ -145,4 +145,30 @@ class UserData @Inject constructor(
             .document(user.id)
             .update(Constants.USER_FRIENDS, newFriends)
     }
+
+
+    override  suspend fun createGroupChatRoom(groupName: String, userList: List<String>): Task<Void> {
+        val chatRoom = Group(
+            groupId =UUID.randomUUID().toString(),
+            groupName =groupName ,
+            groupMember = userList,
+            admin = currentUser!!.uid
+
+        )
+
+        return firestore
+            .collection(Constants.GROUPS_COLLECTION)
+            .document(chatRoom.groupId)
+            .set(chatRoom)
+    }
+
+
+   override  suspend fun getGroupsOfUser(userUid: String): Task<QuerySnapshot> {
+
+        return firestore
+            .collection(Constants.GROUPS_COLLECTION)
+            .whereArrayContains(Constants.GROUP_MEMBERS,userUid)
+            .get()
+    }
+
 }

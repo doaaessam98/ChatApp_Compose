@@ -1,5 +1,6 @@
 package com.example.chatapp.data.source.remote
 
+import com.example.chatapp.model.GroupMember
 import com.example.chatapp.model.User
 import com.example.chatapp.utils.Result
 import com.google.android.gms.tasks.Task
@@ -7,6 +8,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.QuerySnapshot
 
 interface IUserData {
+
       val currentUser: FirebaseUser?
       suspend fun login(email: String,password: String): Result<FirebaseUser>
       suspend fun signup(name: String, password: String,email:String): Result<FirebaseUser>
@@ -17,5 +19,7 @@ interface IUserData {
       suspend fun getAllFriends(friendsIds: List<String>):Task<QuerySnapshot>
       suspend fun removeFriend(user: User, friendId: String): Task<Void>?
       fun isFriendOf(currentUser: User, otherUser: User): Boolean
+      suspend fun createGroupChatRoom(groupName: String, userList: List<String>): Task<Void>
+        suspend fun getGroupsOfUser(userUid: String): Task<QuerySnapshot>
       fun logout()
 }

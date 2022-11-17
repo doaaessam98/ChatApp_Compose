@@ -1,6 +1,8 @@
 package com.example.chatapp.utils
 
 object Constants {
+    val GROUP_MEMBERS: String ="groupMember"
+    val GROUPS_COLLECTION: String ="groups"
     var FRIENDS_LIST: ArrayList<String> =ArrayList()
     const val PROFILE_PICTURE_SIZE = 45
 

@@ -41,10 +41,10 @@ fun LoginScreen(modifier: Modifier =Modifier,
 
 
         CustomImage(modifier = modifier, image = R.drawable.login, des = "login_image")
-                UserEmailField(
+                CustomOutLinedField(
                     modifier = modifier,
-                    emailInputField = viewModel!!.emailInput,
-                    onEmailChanged = viewModel::onEmailChange
+                    inputField = viewModel!!.emailInput,
+                    onValueChanged = viewModel::onEmailChange
 
                     )
                 passwordField(

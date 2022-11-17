@@ -30,5 +30,6 @@
     <string name="search_profile_image_description">profile Image</string>
     <string name="add_friend_description">add Friend</string>
     <string name="empty_friends">empty friends</string>
+    <string name="enter_group_name">Type group name here...</string>
 
 </resources>

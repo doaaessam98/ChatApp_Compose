@@ -1,5 +1,6 @@
 package com.example.chatapp.utils
 
+import androidx.navigation.NavHostController
 import com.google.android.gms.tasks.Task
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -40,6 +41,9 @@ suspend fun <T> Task<T>.await(): T {
 
 
 
+fun onBackClicked(navController: NavHostController) {
+    navController.popBackStack()
 
+}
 
 

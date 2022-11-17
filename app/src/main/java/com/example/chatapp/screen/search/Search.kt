@@ -33,10 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.chatapp.R
 import com.example.chatapp.model.User
-import com.example.chatapp.utils.DefaultProfilePicture
-import com.example.chatapp.utils.ProfilePicture
-import com.example.chatapp.utils.Result
-import com.example.chatapp.utils.ShowLoading
+import com.example.chatapp.utils.*
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -254,10 +251,7 @@ import com.example.chatapp.utils.ShowLoading
         }
 
     }
-    fun onBackClicked(navController: NavHostController) {
-        navController.popBackStack()
 
-    }
 
     @Preview
     @Composable

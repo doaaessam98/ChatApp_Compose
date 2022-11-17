@@ -7,6 +7,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.chatapp.screen.home.HomeScreen
+import com.example.chatapp.screen.profile.ProfileScreen
+import com.example.chatapp.screen.search.SearchScreen
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -25,15 +27,8 @@ fun RootNavigationGraph(modifier: Modifier=Modifier,navController: NavHostContro
         composable(route = Graph.HOME) {
             systemUiController.isStatusBarVisible=true
               HomeScreen()
-      }
-//        composable(route=TopBarScreen.Profile.route){
-//            ProfileScreen(navController)
-//        }
-//
-//        composable(route=TopBarScreen.Search.route){
-//
-//            SearchScreen(modifier,navController=navController)
-//        }
+         }
+
 
     }
 
@@ -44,6 +39,7 @@ object Graph{
     const val ROOT="root_graph"
     const val AUTHENTICATION="ath_graph"
     const val HOME="home_graph"
+    const val CREATE_GROUP="group_graph"
     const val APPBAR="app_bar"
 
 

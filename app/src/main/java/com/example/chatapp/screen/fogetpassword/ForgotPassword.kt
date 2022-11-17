@@ -26,7 +26,7 @@ import com.example.chatapp.graphs.AuthScreen
 import com.example.chatapp.utils.CustomImage
 import com.example.chatapp.utils.ShowLoading
 import com.example.chatapp.utils.ShowToast
-import com.example.chatapp.utils.UserEmailField
+import com.example.chatapp.utils.CustomOutLinedField
 import com.example.chatapp.utils.Result
 
 
@@ -80,9 +80,9 @@ fun ScreenContent(modifier: Modifier,viewModel:ForgetPasswordViewModel){
 
 
         CustomImage(modifier, R.drawable.password,"forgot_password_image")
-        UserEmailField(modifier =modifier ,
-            emailInputField = viewModel.emailInput,
-            onEmailChanged = viewModel::onEmailChange )
+        CustomOutLinedField(modifier =modifier ,
+            inputField = viewModel.emailInput,
+            onValueChanged = viewModel::onEmailChange )
          SentRestEmailButton(modifier = modifier, viewModel = viewModel)
 
 

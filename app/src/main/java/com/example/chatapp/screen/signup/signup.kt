@@ -67,9 +67,9 @@ fun SignupScreen(
                   onNameChanged = viewModel::onNameChanged
               )
 
-              UserEmailField(modifier = modifier,
-                  emailInputField = viewModel.emailInput,
-                  onEmailChanged = viewModel::onEmailChange
+              CustomOutLinedField(modifier = modifier,
+                  inputField = viewModel.emailInput,
+                  onValueChanged = viewModel::onEmailChange
               )
 
               passwordField(modifier = modifier,

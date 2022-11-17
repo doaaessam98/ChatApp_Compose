@@ -1,23 +1,29 @@
 package com.example.chatapp.graphs
 
+import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.chatapp.R
 import com.example.chatapp.screen.chats.ChatsScreen
 import com.example.chatapp.screen.friends.FriendsScreen
+import com.example.chatapp.screen.groups.CreateGroupViewModel
 import com.example.chatapp.screen.groups.GroupsScreen
 import com.example.chatapp.screen.profile.ProfileScreen
 import com.example.chatapp.screen.search.SearchScreen
+import com.example.chatapp.screen.signup.SignupViewModel
 
 @Composable
 fun HomeNavGraph(modifier:Modifier,navController:NavHostController){
+    val viewModel :CreateGroupViewModel = hiltViewModel()
+
     NavHost(navController = navController,
         route=Graph.HOME,
         startDestination = HomeNavigationItem.Chats.route,
@@ -27,23 +33,18 @@ fun HomeNavGraph(modifier:Modifier,navController:NavHostController){
         composable(route = HomeNavigationItem.Chats.route){
             ChatsScreen(modifier = modifier, navController = navController)
         }
-
-
-        composable(route= HomeNavigationItem.Groups.route){
-            GroupsScreen(modifier = modifier, navController = navController)
-        }
         composable(route= HomeNavigationItem.Friends.route){
             FriendsScreen(modifier = modifier, navController = navController)
         }
 
-        composable(route=TopBarScreen.Profile.route){
-            ProfileScreen(navController)
-        }
+//        composable(route= HomeNavigationItem.Groups.route){
+//            GroupsScreen(modifier = modifier, navController = navController)
+//        }
+        CreateGroupNavGraph(modifier = modifier, navController = navController,viewModel)
 
-        composable(route=TopBarScreen.Search.route){
 
-            SearchScreen(modifier,navController=navController)
-        }
+
+
     }
 }
 

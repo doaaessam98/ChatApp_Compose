@@ -170,13 +170,14 @@ fun FriendCard(modifier: Modifier, onRemoveClicked:(User)->Unit, onFriendClick:(
         ) {
             if(true) {
                 DefaultProfilePicture(modifier, friend.name)
-                Text(
-                    text = friend.name, style = MaterialTheme.typography.subtitle1,
-                    modifier = modifier.padding(start = 16.dp)
-                )
+
             } else {
                 ProfilePicture(picture = null, name = friend.name)
             }
+            Text(
+                text = friend.name, style = MaterialTheme.typography.subtitle1,
+                modifier = modifier.padding(start = 16.dp)
+            )
         }
         IconButton(
             onClick = {onRemoveClicked.invoke(friend) },

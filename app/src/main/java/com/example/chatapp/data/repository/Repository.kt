@@ -3,10 +3,11 @@ package com.example.chatapp.data.repository
 import android.content.ContentValues.TAG
 import android.util.Log
 import com.example.chatapp.data.source.remote.IUserData
+import com.example.chatapp.model.Group
+import com.example.chatapp.model.GroupMember
 import com.example.chatapp.model.User
 import com.example.chatapp.utils.Result
 import com.example.chatapp.utils.await
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import javax.inject.Inject
 
@@ -62,6 +63,7 @@ class Repository @Inject constructor(private val  userData: IUserData) :IReposit
 
     override suspend fun addFriend(currentUser: User,userFriendId: String):Result<Void?>{
         return  try {
+
             val result= userData.addFriend(currentUser,userFriendId)?.await()
 
             //  Constants.FRIENDS_LIST.add(userFriendId)
@@ -107,6 +109,44 @@ class Repository @Inject constructor(private val  userData: IUserData) :IReposit
       }catch (e:Exception){
          Result.Failure(e)
       }
+    }
+
+    override suspend fun getUsers(): Result<List<User>> {
+        return try {
+            val result = userData.getUsers().await()
+            val users = result.toObjects(User::class.java)
+            Result.Success(users)
+        }catch (e:Exception){
+            Result.Failure(e)
+        }
+    }
+
+    override suspend fun createGroupChatRoom(
+        groupName: String,
+        groupMembers: List<String>
+    ): Result<Void> {
+       return try {
+            val members = groupMembers.plus(currentUser!!.uid)
+           val result = userData.createGroupChatRoom(groupName,members).await()
+           Result.Success(result)
+       }catch (e:Exception){
+           Result.Failure(e)
+       }
+    }
+
+
+    override suspend fun getGroupsOfUser(): Result<List<Group>> {
+        return  try {
+             val result = userData.getGroupsOfUser(currentUser!!.uid).await()
+            Log.e(TAG, "getGroupsOfUser: ${result.size()}", )
+            Log.e(TAG, "getGroupsOfUser: ${result.isEmpty}", )
+
+            val groups = result.toObjects(Group::class.java)
+            Log.e(TAG, "getGroupsOfUser: ${groups}", )
+             Result.Success(groups)
+        }catch (e:Exception){
+            Result.Failure(e)
+        }
     }
 }
 

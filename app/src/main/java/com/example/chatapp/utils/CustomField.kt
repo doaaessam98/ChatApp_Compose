@@ -14,10 +14,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,13 +64,13 @@ private fun loadImageBitmapResource(res: Resources, id: Int): ImageBitmap {
     }
 }
 @Composable
-fun UserEmailField(
+fun CustomOutLinedField(
     modifier: Modifier,
-    emailInputField: StateFlow<InputField>,
-    onEmailChanged: (String) -> Unit,
+    inputField: StateFlow<InputField>,
+    onValueChanged: (String) -> Unit,
     ) {
     val focusManager = LocalFocusManager.current
-    val email =emailInputField.collectAsState()
+    val email =inputField.collectAsState()
 
 
 
@@ -83,7 +80,7 @@ fun UserEmailField(
         OutlinedTextField(
             value = email.value.input,
             onValueChange = {
-             onEmailChanged(it)
+             onValueChanged(it)
             },
             label = { Text(text =if(email.value.isError) stringResource(id = R.string.email_example) else stringResource(id = R.string.enter_email)) },
             maxLines = 1,
@@ -233,7 +230,42 @@ fun GifImage(
     )
 }
 
+@Composable
+fun CustomTopBar(modifier: Modifier,title:String,description:String,onBackClicked :()->Unit) {
+    TopAppBar(
+        backgroundColor = Color(0xFF407BFF),
+        navigationIcon = {
+            IconButton(onClick = { onBackClicked.invoke()}) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    tint = Color.White,
+                    contentDescription = stringResource(id = R.string.back)
+                )
+            }
+        },
+        title = {
+            Column(verticalArrangement = Arrangement.Center,
 
+                ) {
+                androidx.compose.material3.Text(
+                    text = title
+                    ,
+                    color = Color.White,
+                    style = MaterialTheme.typography.body1
+                )
+                androidx.compose.material3.Text(
+                    text = description,
+                    color = Color.White,
+                    style = MaterialTheme.typography.subtitle1,
+                )
+
+            }
+
+        }
+    )
+
+
+}
 @Composable
 fun PhoneNumberField(
     modifier: Modifier,

@@ -1,17 +1,13 @@
 package com.example.chatapp.screen.groups
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.chatapp.data.repository.IRepository
-import com.example.chatapp.model.GroupMember
-import com.example.chatapp.model.InputField
-import com.example.chatapp.model.User
+import com.example.chatapp.data.repository.userRepository.IRepository
+import com.example.chatapp.model.*
+import com.example.chatapp.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
-import com.example.chatapp.utils.Result
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
@@ -19,8 +15,8 @@ import kotlinx.coroutines.launch
 class CreateGroupViewModel @Inject constructor(private  val repository: IRepository):ViewModel() {
 
 
-    private val _allUsers = MutableStateFlow<Result<List<User>>>(Result.Idle)
-    val allUsers: StateFlow<Result<List<User>>>
+    private val _allUsers = MutableStateFlow(ScreenState())
+    val allUsers: StateFlow<ScreenState>
         get() = _allUsers
 
 
@@ -30,8 +26,8 @@ class CreateGroupViewModel @Inject constructor(private  val repository: IReposit
 
 
 
-    private val _createGroup = MutableStateFlow<Result<Void>>(Result.Idle)
-    val createGroup: StateFlow<Result<Void>>
+    private val _createGroup = MutableStateFlow(CreateGroupScreenState())
+    val createGroup: StateFlow<CreateGroupScreenState>
         get() = _createGroup
 
 
@@ -43,10 +39,28 @@ class CreateGroupViewModel @Inject constructor(private  val repository: IReposit
     }
 
     private fun getAllUsers() {
-        _allUsers.value = Result.Loading
         viewModelScope.launch {
-            val result = repository.getUsers()
-            _allUsers.emit(result)
+            val response = repository.getUsers()
+            when (response) {
+                is Resource.Loading -> {
+                    _allUsers.value =ScreenState(isLoading = true)
+                }
+                is Resource.Error -> {
+                    _allUsers.value =
+                        ScreenState(
+                            hasError = true,
+                            errorMessage = response.message
+                        )
+                }
+                is Resource.Success -> {
+                    _allUsers.value=ScreenState(
+                        data = response.data
+
+                    )
+                }
+
+
+            }
 
 
         }
@@ -85,11 +99,28 @@ class CreateGroupViewModel @Inject constructor(private  val repository: IReposit
 
     fun createNewGroup() {
         val groupMember = mapSelectedUsersToGroupMember()
-        _createGroup.value = Result.Loading
         viewModelScope.launch {
+            val response =  repository.createGroupChatRoom(_groupNameInput.value.input, groupMember)
+            when (response) {
+                is Resource.Loading -> {
+                    _createGroup.value =CreateGroupScreenState(isLoading = true)
+                }
+                is Resource.Error -> {
+                   _createGroup.value =
+                        CreateGroupScreenState(
+                            hasError = true,
+                            errorMessage = response.message
+                        )
+                }
+                is Resource.Success -> {
+                    _createGroup.value=CreateGroupScreenState(
+                         data = response.data
 
-           val result =  repository.createGroupChatRoom(_groupNameInput.value.input, groupMember)
-            _createGroup.emit(result)
+                    )
+                }
+
+
+            }
         }
     }
 

@@ -1,19 +1,15 @@
 package com.example.chatapp.screen.signup
 
 import android.app.Application
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chatapp.R
-import com.example.chatapp.data.repository.IRepository
+import com.example.chatapp.data.repository.userRepository.IRepository
 import com.example.chatapp.model.InputField
-import com.example.chatapp.utils.Result
+import com.example.chatapp.model.GroupScreenState
 import com.example.chatapp.utils.isEmail
 import com.example.chatapp.utils.isUserName
-import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -22,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SignupViewModel @Inject constructor(
     private val repository: IRepository,
-      application: Application
+    application: Application
      ) :AndroidViewModel(application){
 
 
@@ -36,9 +32,10 @@ class SignupViewModel @Inject constructor(
     private val _nameInput = MutableStateFlow(InputField())
     val nameInput: StateFlow<InputField> = _nameInput
 
-
-    private val _signupFlow = MutableStateFlow<Result<FirebaseUser>?> (Result.Idle)
-    val signupFlow :StateFlow<Result<FirebaseUser>?> = _signupFlow
+    private val _signupFlow = MutableStateFlow(GroupScreenState())
+    val signupFlow :StateFlow<GroupScreenState> = _signupFlow
+    // private val _signupFlow = MutableStateFlow<Resource<FirebaseUser>?> ()
+    // val signupFlow :StateFlow<Resource<FirebaseUser>?> = _signupFlow
 
 
     private val _isButtonEnable = MutableStateFlow(true)
@@ -85,12 +82,16 @@ class SignupViewModel @Inject constructor(
             else -> {
                 viewModelScope.launch {
                     _isButtonEnable.emit(false)
-                    _signupFlow.emit(Result.Loading)
+
                     val result = repository.signup(name, email, password)
-                    _signupFlow.emit(result)
-                    _isButtonEnable.emit(true)
-                    delay(300)
-                    _signupFlow.emit(Result.Idle)
+//                    checkResponse(
+//                        result,
+//                        onLoading={_signupFlow.value = GroupScreenState(isLoading = true)},
+//                        onError = {_signupFlow.value =GroupScreenState(hasError = true, errorMessage = it)},
+//                        onSuccess = {_signupFlow.value =GroupScreenState(data = it)})
+
+                         _isButtonEnable.emit(true)
+
 
                 }
             }

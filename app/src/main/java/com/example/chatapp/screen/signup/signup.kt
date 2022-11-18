@@ -56,12 +56,7 @@ fun SignupScreen(
 
     {
 
-
-
-
-
-
-              CustomImage(modifier = modifier, image = R.drawable.signup, des ="singup_image" )
+        CustomImage(modifier = modifier, image = R.drawable.signup, des ="singup_image" )
               UserNameField(modifier,
                   nameInputField = viewModel!!.nameInput,
                   onNameChanged = viewModel::onNameChanged
@@ -96,25 +91,25 @@ fun SignupStatus(modifier: Modifier, viewModel:SignupViewModel?, navController: 
 
     val context = LocalContext.current
     authResource?.value.let { result->
-       when(result){
-            is Result.Loading ->{
-                ShowLoading(modifier=modifier)
-            }
-           is Result.Failure ->{
-               ShowToast(context,message = result.exception.message.toString())
-           }
-           is Result.Success -> {
-               LaunchedEffect(Unit) {
-                   navController.navigate(Graph.HOME) {
-                       popUpTo(AuthScreen.Signup.route) {
-                           inclusive = true
-                       }
-                   }
-               }
-           }
+        // when(result){
+        //     is com.example.chatapp.utils.Result.Resource1.Loading ->{
+        //        ShowLoading(modifier=modifier)
+        //    }
+        //   is com.example.chatapp.utils.Result.Resource1.Failure ->{
+        //      ShowToast(context,message = result.exception.message.toString())
+        //  }
+        //  is com.example.chatapp.utils.Result.Resource1.Success -> {
+        //     LaunchedEffect(Unit) {
+                   //          navController.navigate(Graph.HOME) {
+        ////           popUpTo(AuthScreen.Signup.route) {
+        //                inclusive = true
+        //            }
+        //        }
+        //     }
+        //// }
 
-           else -> {}
-       }
+        //  else -> {}
+        // }
 
 
 

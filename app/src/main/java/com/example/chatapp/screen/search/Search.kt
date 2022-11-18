@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -19,7 +18,6 @@ import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -56,18 +54,18 @@ import com.example.chatapp.utils.*
         val searchState =  viewModel.searchResults.collectAsState()
         var isFailed by remember { mutableStateOf(false) }
          searchState.value.let { response ->
-             when(response){
-                 is Result.Loading ->{
-                     ShowLoading(modifier=modifier)
-                 }
-                 is Result.Failure ->{
-                   isFailed=true
-
-                 }
-                 is Result.Success -> {
-                      users=response.result
-                 }
-         }
+//             when(response){
+//                 is com.example.chatapp.utils.Result.Resource1.Loading ->{
+//                     ShowLoading(modifier=modifier)
+//                 }
+//                 is com.example.chatapp.utils.Result.Resource1.Failure ->{
+//                   isFailed=true
+//
+//                 }
+//                 is com.example.chatapp.utils.Result.Resource1.Success -> {
+//                      users=response.result
+//                 }
+//         }
              Box (modifier.fillMaxSize()){
                  if (users.isNotEmpty()){
                   LazyColumn(){
@@ -86,7 +84,7 @@ import com.example.chatapp.utils.*
                       }
                   }
                }else{
-                    if(isFailed || searchState.value!= Result.Loading){
+                    if(isFailed){
                         Text( modifier = modifier.align(Alignment.Center),text = "No Result Found", style = MaterialTheme.typography.subtitle1)
 
                     }

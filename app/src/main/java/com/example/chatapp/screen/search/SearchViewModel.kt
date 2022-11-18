@@ -8,21 +8,21 @@ import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.chatapp.data.repository.IRepository
+import com.example.chatapp.data.repository.userRepository.IRepository
 import com.example.chatapp.model.InputField
+import com.example.chatapp.model.GroupScreenState
 import com.example.chatapp.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
-import  com.example.chatapp.utils.Result
 import com.example.chatapp.utils.SearchValues
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-     private val repository: IRepository,
-     application: Application
+    private val repository: IRepository,
+    application: Application
 )
 
     :AndroidViewModel(application){
@@ -30,9 +30,9 @@ class SearchViewModel @Inject constructor(
     private val _searchBar = MutableStateFlow(InputField())
     val searchBar: StateFlow<InputField> = _searchBar
 
-    private val _searchResults = MutableStateFlow<Result<List<User>>>(Result.Idle)
+    private val _searchResults = MutableStateFlow(GroupScreenState())
 
-    val searchResults: StateFlow<Result<List<User>>> = _searchResults
+    val searchResults: StateFlow<GroupScreenState> = _searchResults
 
     private var searchStarterTimer: CountDownTimer? = null
      var currentUser:User?=null
@@ -47,18 +47,7 @@ class SearchViewModel @Inject constructor(
 
         viewModelScope.launch {
             repository.getCurrentUser().let { userResult->
-            when(userResult){
-                is  Result.Success->{
-                     currentUser = userResult.result
-                    Log.e(TAG, "getCurrentUser: ${userResult.result?.friends}", )
 
-                }
-                is Result.Failure->{
-                    Log.e(TAG, "getCurrentUser: ${userResult.exception}", )
-                }
-
-                else -> {}
-            }
 
             }
         }
@@ -93,9 +82,9 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun searchForUsers(searchString: String) =viewModelScope.launch {
-        _searchResults.value=Result.Loading
+        //_searchResults.value=Resource.Loading
         val result = repository.searchForUser(searchString)
-         _searchResults.value=result
+        // _searchResults.value=result
 
 
     }

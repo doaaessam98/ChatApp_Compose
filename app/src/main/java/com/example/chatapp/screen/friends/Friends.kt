@@ -1,9 +1,6 @@
 package com.example.chatapp.screen.friends
 
 import android.annotation.SuppressLint
-import android.content.ContentValues.TAG
-import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,13 +9,13 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.PersonRemove
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,22 +23,38 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.chatapp.R
 import com.example.chatapp.graphs.TopBarScreen
+import com.example.chatapp.model.ScreenState
 import com.example.chatapp.model.User
-import com.example.chatapp.utils.*
+import com.example.chatapp.utils.DefaultProfilePicture
+import com.example.chatapp.utils.FloatingButton
+import com.example.chatapp.utils.ProfilePicture
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun FriendsScreen(modifier: Modifier, navController: NavHostController,viewModel: FriendsViewModel= hiltViewModel()){
 
+    val state =viewModel.allFriends.collectAsState().value
+    val showDialogState: Boolean by viewModel.showDialog.collectAsState()
 
-     Scaffold (
+    Scaffold (
               floatingActionButton = { FloatingButton(modifier = modifier, icon = Icons.Default.PersonAdd) {
                      navController.navigate(TopBarScreen.Search.route)
               }},
                floatingActionButtonPosition = FabPosition.End )
      { contentPadding->
 
-          FriendsList(modifier = modifier, navController = navController, viewModel = viewModel)
+          FriendsList(modifier = modifier,
+              state,
+              onRemoveClicked=viewModel::onRemoveClicked,
+              onFriendClicked=viewModel::onFriendClicked
+          )
+
+
+         ShowConfirmDialog(showDialogState,
+          viewModel::onDialogDismiss,
+         viewModel::onDialogConfirm,
+         viewModel.friend?.name)
+
      }
 
 
@@ -51,80 +64,32 @@ fun FriendsScreen(modifier: Modifier, navController: NavHostController,viewModel
 }
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun FriendsList(modifier: Modifier,viewModel: FriendsViewModel,navController: NavHostController){
-    var friends :List<User> = listOf()
-    var isSuccess by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
-    FriendsState(modifier,viewModel, onLoading = {isLoading=it}, onSuccess = { friendsList->
-        isSuccess=true
-        friends=friendsList
-
-    })
-
+fun FriendsList(modifier: Modifier, friendsState: ScreenState,onRemoveClicked:(User)->Unit,onFriendClicked:(String)->Unit){
+    friendsState.data?.let { friends->
         Box(modifier.fillMaxSize()) {
-
-          if(friends.isNotEmpty()||isSuccess) {
-              Log.e(TAG, "FriendsList: is not empty+${friends.size}", )
             LazyColumn {
                 items(friends) { friend ->
                     FriendCard(
                         modifier = modifier,
-                         onFriendClick =viewModel::onFriendClicked ,
-                          onRemoveClicked =viewModel::onRemoveClicked,
+                         onFriendClick =onFriendClicked ,
+                          onRemoveClicked =onRemoveClicked,
                           friend = friend,
                         )
                 }
             }
-        }else {
-              if(!isLoading) {
-                  Log.e(TAG, "FriendsList: is loading", )
-                  Column(modifier.align(Alignment.Center)) {
-                      // GifImage(modifier)
-                      Image(
-                          painter = painterResource(R.drawable.empty_friends_list),
-                          contentDescription = stringResource(id = R.string.empty_friends),
+        }}
 
-                      )
-                  }
-              }
-          }
+      if(friendsState.hasError){
 
-            ShowConfirmDialog(viewModel)
+      }
 
 
 
-    }
+
 }
 
 
-@Composable
-fun FriendsState(
-    modifier: Modifier,
-    viewModel: FriendsViewModel,
-    onSuccess: (List<User>) -> Unit,
-    onLoading:(Boolean)->Unit)
-{
-    val context = LocalContext.current
-    val state =viewModel.allFriends.collectAsState()
-    state.value.let { response->
-        when(response){
-            is Result.Loading-> {
-                ShowLoading(modifier = modifier)
-                onLoading(true)
-            }
-            is Result.Failure ->{
-                response.exception.localizedMessage?.let { ShowToast(context =context , message = it) }
-            }
-            is Result.Success ->{
-               
-                Log.e(TAG, "FriendsState: ${response.result}", )
-                onSuccess(response.result)
-            }
- 
-            else -> {}
-        }
-    }
-}
+
 @Composable
 fun DeleteFriendsState(
     modifier: Modifier,
@@ -133,21 +98,8 @@ fun DeleteFriendsState(
     val context = LocalContext.current
     val state =viewModel.removeFriend.collectAsState()
     state.value.let { response->
-        when(response){
-            is Result.Loading-> {
-                ShowLoading(modifier = modifier)
 
-            }
-            is Result.Failure ->{
-                response.exception.localizedMessage?.let { ShowToast(context =context , message = it) }
-            }
-            is Result.Success ->{
-                ShowToast(context = context, message = "${viewModel.friend?.friends}  is Delete from Friends")
-               viewModel.getAllFriends()
-            }
 
-            else -> {}
-        }
     }
 }
 
@@ -202,25 +154,26 @@ fun FriendCard(modifier: Modifier, onRemoveClicked:(User)->Unit, onFriendClick:(
 
 @Composable
 fun ShowConfirmDialog(
-     viewModel: FriendsViewModel
-
+    showDialogState : Boolean,
+    onDialogDismiss:()->Unit,
+    onDialogConfirm:()->Unit,
+    friendName:String?
 ) {
-    val showDialogState: Boolean by viewModel.showDialog.collectAsState()
 
 
     if (showDialogState) {
         AlertDialog(
-            onDismissRequest = {viewModel.onDialogDismiss()},
+            onDismissRequest = {onDialogDismiss.invoke()},
             confirmButton = {
-                TextButton(onClick = {viewModel.onDialogConfirm()})
+                TextButton(onClick = {onDialogConfirm.invoke()})
                 { Text(text = "OK") }
             },
             dismissButton = {
-                TextButton(onClick = {viewModel.onDialogDismiss()})
+                TextButton(onClick = {onDialogDismiss()})
                 { Text(text = "Cancel") }
             },
             title = { Text(text = "Please confirm") },
-            text = { Text(text = "did  you sure you want to remove${viewModel.friend?.name} from friends") }
+            text = { Text(text = "did  you sure you want to remove${friendName} from friends") }
         )
     }
 

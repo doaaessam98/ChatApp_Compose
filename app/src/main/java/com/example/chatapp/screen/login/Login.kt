@@ -63,11 +63,13 @@ fun LoginScreen(modifier: Modifier =Modifier,
 
 
 
+    val state= viewModel?.loginFlow?.collectAsState()
+      state?.value.let {
+
+      }
 
 
-
-    LoginStatus(modifier
-        ,navController,viewModel)
+    //LoginStatus(modifier,navController,viewModel)
 
 
 }
@@ -84,41 +86,6 @@ fun ForgotPassword(modifier: Modifier,navController: NavHostController) {
 
 
 
-@SuppressLint("SuspiciousIndentation")
-@Composable
-fun LoginStatus(modifier: Modifier,navController: NavHostController,viewModel: LoginViewModel?) {
-    val context = LocalContext.current
-
- val state= viewModel?.loginFlow?.collectAsState()
-     state?.value.let { result->
-        when(result){
-            is Result.Loading ->{
-
-            ShowLoading(modifier = modifier)
-            }
-            is Result.Failure ->{
-                ShowToast(context,message = result.exception.message.toString())
-
-            }
-            is Result.Success -> {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Graph.HOME) {
-                        popUpTo(AuthScreen.Login.route) {
-                            inclusive = true
-
-
-                        }
-                    }
-                }
-            }
-            else -> {}
-        }
-
-        }
-
-
-
-    }
 
 
 

@@ -1,11 +1,15 @@
 package com.example.chatapp.screen.friends
 
 import android.annotation.SuppressLint
+import android.content.ContentValues
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.chatapp.data.repository.IRepository
+import com.example.chatapp.data.repository.userRepository.IRepository
+import com.example.chatapp.model.GroupScreenState
+import com.example.chatapp.model.ScreenState
 import com.example.chatapp.model.User
-import com.example.chatapp.utils.Result
+import com.example.chatapp.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,14 +19,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FriendsViewModel @Inject constructor(
-             private val repository: IRepository)
+             private val repository: IRepository
+)
 
     :ViewModel(){
-    private  val _allFriends = MutableStateFlow<Result<List<User>>>(Result.Idle)
-    val allFriends :StateFlow<Result<List<User>>> = _allFriends
+    private  val _allFriends = MutableStateFlow(ScreenState())
+    val allFriends :StateFlow<ScreenState> = _allFriends
 
-    private  val _removeFriend = MutableStateFlow<Result<Void?>>(Result.Idle)
-    val removeFriend :StateFlow<Result<Void?>> = _removeFriend
+
+    private  val _removeFriend = MutableStateFlow(ScreenState())
+    val removeFriend :StateFlow<ScreenState> = _removeFriend
 
 
     private val _showDialog = MutableStateFlow(false)
@@ -35,11 +41,32 @@ class FriendsViewModel @Inject constructor(
 
     @SuppressLint("SuspiciousIndentation")
      fun getAllFriends() {
-        _allFriends.value=(Result.Loading)
+
 
         viewModelScope.launch {
-         val result: Result<List<User>> =  repository.getAllFriends()
-           _allFriends.emit(result)
+         val response=  repository.getAllFriends()
+            //checkResponse(response, onLoading = {}, onError = {}, onSuccess = {})
+            when (response) {
+                is Resource.Loading -> {
+                    _allFriends.value =ScreenState(isLoading = true)
+                }
+                is Resource.Error -> {
+                    _allFriends.value =
+                        ScreenState(
+                            hasError = true,
+                            errorMessage = response.message
+                        )
+                }
+                is Resource.Success -> {
+                    Log.e(ContentValues.TAG, "GroupsScreenContent: ", )
+                    _allFriends.value= ScreenState(
+                        data = response.data
+
+                    )
+                }
+
+
+            }
 
          }
     }
@@ -64,8 +91,28 @@ class FriendsViewModel @Inject constructor(
     fun onDialogConfirm() {
         _showDialog.value = false
         viewModelScope.launch {
-          val result=repository.removeFriend(friend!!.id)
-            _removeFriend.emit(result)
+          val response=repository.removeFriend(friend!!.id)
+            when (response) {
+                is Resource.Loading -> {
+                    _removeFriend.value =ScreenState(isLoading = true)
+                }
+                is Resource.Error -> {
+                    _allFriends.value =
+                        ScreenState(
+                            hasError = true,
+                            errorMessage = response.message
+                        )
+                }
+                is Resource.Success -> {
+                    Log.e(ContentValues.TAG, "GroupsScreenContent: ", )
+                    _removeFriend.value= ScreenState(
+                      //  data = response
+
+                    )
+                }
+
+
+            }
         }
     }
 

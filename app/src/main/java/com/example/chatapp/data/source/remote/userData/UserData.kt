@@ -1,12 +1,9 @@
-package com.example.chatapp.data.source.remote
+package com.example.chatapp.data.source.remote.userData
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import com.example.chatapp.model.Group
-import com.example.chatapp.model.GroupMember
 import com.example.chatapp.model.User
 import com.example.chatapp.utils.Constants
-import com.example.chatapp.utils.Result
+import com.example.chatapp.utils.Resource
 import com.example.chatapp.utils.await
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
@@ -27,14 +24,14 @@ class UserData @Inject constructor(
     override val currentUser: FirebaseUser?
         get() = firebaseAuth.currentUser
 
-    override suspend fun login(email: String, password: String): Result<FirebaseUser> {
+    override suspend fun login(email: String, password: String): Resource<FirebaseUser> {
         return try {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
 
-            Result.Success(result.user!!)
+            Resource.Success(result.user!!)
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Failure(e)
+            Resource.Error(e.localizedMessage)
         }
     }
 
@@ -42,7 +39,7 @@ class UserData @Inject constructor(
         name: String,
         password: String,
         email: String
-    ): Result<FirebaseUser> {
+    ): Resource<FirebaseUser> {
         return try {
             val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
             result.user?.updateProfile(
@@ -50,10 +47,10 @@ class UserData @Inject constructor(
             )?.await()
             //result.user?.sendEmailVerification()
             addUserToDatabase(result.user!!).await()
-            Result.Success(result.user!!)
+            Resource.Success(result.user!!)
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Failure(e)
+            Resource.Error(e.localizedMessage)
         }
     }
 
@@ -74,12 +71,12 @@ class UserData @Inject constructor(
         )
     }
 
-    override suspend fun restPassword(email: String): Result<Boolean> {
+    override suspend fun restPassword(email: String): Resource<Boolean> {
         return try {
             Firebase.auth.sendPasswordResetEmail(email).await()
-            Result.Success(true)
+            Resource.Success(true)
         } catch (e: Exception) {
-            Result.Failure(e)
+            Resource.Error(e.localizedMessage)
         }
 
 

@@ -4,21 +4,20 @@ import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.chatapp.data.repository.IRepository
-import com.example.chatapp.model.Group
+import com.example.chatapp.data.repository.userRepository.IRepository
+import com.example.chatapp.model.GroupScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import com.example.chatapp.utils.Result
-import kotlinx.coroutines.delay
+import com.example.chatapp.utils.Resource
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
 class GroupViewModel @Inject constructor(private  val repository: IRepository):ViewModel() {
 
-  private  val _userGroups = MutableStateFlow<Result<List<Group>>> (Result.Idle)
-    val userGroups :StateFlow<Result<List<Group>>> = _userGroups
+    val _userGroups = MutableStateFlow (GroupScreenState())
+    val userGroups :StateFlow<GroupScreenState> = _userGroups
 
      init {
          Log.e(TAG, "init : ", )
@@ -28,13 +27,29 @@ class GroupViewModel @Inject constructor(private  val repository: IRepository):V
      }
 
     private fun getUserGroup() {
-        _userGroups.value =Result.Loading
+        _userGroups.value =GroupScreenState(isLoading = true)
         viewModelScope.launch {
-              val result = repository.getGroupsOfUser()
-              _userGroups.emit(result)
-            delay(300)
-            _userGroups.emit(Result.Idle)
+            val response = repository.getGroupsOfUser()
+            when (response) {
+                is Resource.Loading -> {
+                    _userGroups.value =GroupScreenState(isLoading = true)
+                }
+                is Resource.Error -> {
+                    _userGroups.value =
+                        GroupScreenState(
+                        hasError = true,
+                        errorMessage = response.message
+                    )
+                }
+                is Resource.Success -> {
+                   _userGroups.value= GroupScreenState(
+                       data = response.data
 
+                   )
+                }
+
+
+            }
         }
     }
 

@@ -15,20 +15,24 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.chatapp.R
 import com.example.chatapp.graphs.CreateGroupScreen
 import com.example.chatapp.model.Group
-import com.example.chatapp.model.User
+import com.example.chatapp.model.GroupScreenState
 import com.example.chatapp.utils.*
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun GroupsScreen(modifier: Modifier,navController: NavHostController ,viewModel: GroupViewModel= hiltViewModel() ){
+fun GroupsScreen(modifier: Modifier, navController: NavHostController , viewModel: GroupViewModel= hiltViewModel() ){
+
+    val groupsState = viewModel.userGroups.collectAsState().value
 
 
     Scaffold(
@@ -40,56 +44,40 @@ fun GroupsScreen(modifier: Modifier,navController: NavHostController ,viewModel:
         floatingActionButtonPosition = FabPosition.End
     ) { paddintContent->
 
-        GroupsScreenContent(modifier,viewModel)
+        GroupsScreenContent(modifier,groupsState,viewModel::onGroupClicked,viewModel::onRemoveClicked)
 
     }
 
 }
+
 @Composable
-fun GetGroupsState(modifier: Modifier,viewModel: GroupViewModel,onSuccess:(List<Group>)->Unit,onLoading:(Boolean)->Unit) {
-    val context = LocalContext.current
-    val groupsState = viewModel.userGroups.collectAsState().value
+fun GroupsScreenContent(modifier: Modifier, state: GroupScreenState, onGroupClicked:(String)->Unit, onRemoveClicked:(String)->Unit) {
 
-    groupsState.let { response ->
-        when (response) {
-            is Result.Loading -> {
-                ShowLoading(modifier = modifier)
-                onLoading.invoke(true)
-            }
-            is Result.Failure -> {
-                response.exception.localizedMessage?.let {
-                    ShowToast(
-                        context = context,
-                        message = it
-                    )
-                }
-            }
-            is Result.Success -> {
-                onSuccess(response.result)
-            }
+    state.data?.let {groups->
 
-            else -> {}
-
+    LazyColumn {
+        items(groups){ group->
+            GroupItemContent(modifier,group,onGroupClicked,onRemoveClicked)
         }
     }
+
 }
-@Composable
-fun GroupsScreenContent(modifier: Modifier,viewModel: GroupViewModel) {
-    var groups = remember { mutableStateOf(listOf<Group>())}
-    var loading by remember { mutableStateOf(false) }
-    GetGroupsState(modifier = modifier, viewModel = viewModel,
-      onSuccess = {  groups.value = it}, onLoading ={loading=it} )
-    if(groups.value.isNotEmpty()&& loading){
-    LazyColumn(){
-        items(groups.value){group->
-            GroupItemContent(modifier,group,viewModel::onGroupClicked,viewModel::onRemoveClicked)
-        }
+    if (state.hasError) {
+        Text(
+            text = state.errorMessage ?: "Something went wrong",
+            style = TextStyle(
+                color = Color.DarkGray,
+                fontSize = 40.sp,
+                textAlign = TextAlign.Center
+            )
+        )
     }
-    }else{
-        if(loading){
-            // handel empty list
-        }
+
+    if (state.isLoading) {
+        ShowLoading(modifier = modifier)
     }
+
+
 }
 
 @Composable

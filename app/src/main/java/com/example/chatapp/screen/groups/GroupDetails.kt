@@ -26,12 +26,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.chatapp.R
 import com.example.chatapp.graphs.CreateGroupScreen
 import com.example.chatapp.graphs.HomeNavigationItem
+import com.example.chatapp.model.CreateGroupScreenState
 import com.example.chatapp.model.InputField
 import com.example.chatapp.utils.*
 import kotlinx.coroutines.flow.StateFlow
@@ -43,6 +42,8 @@ fun GroupDetailsScreen(modifier:Modifier,navController: NavHostController,viewMo
     val groupName = viewModel.groupNameInput.collectAsState().value
     var isGroupNameEmpty by remember { mutableStateOf(false) }
     val createGroupState = viewModel.createGroup.collectAsState().value
+    val selectedMemberState = viewModel.selectedMember.collectAsState()
+
 
     Scaffold (
 
@@ -52,47 +53,45 @@ fun GroupDetailsScreen(modifier:Modifier,navController: NavHostController,viewMo
         } },
         floatingActionButton = { FloatingButton(modifier = modifier, icon = Icons.Default.Done)
         {
-            if(groupName.input.isNotEmpty())
-               {
-                   Log.e(TAG, "GroupDetailsScreen: ", )
-                  viewModel.createNewGroup()
-                }
-            else{
+            if(groupName.input.isNotEmpty()) {
+                viewModel.createNewGroup()
+             } else{
                isGroupNameEmpty = true
             }
         } }
     ){  contentPadding->
-          DetailsScreenContent(modifier,viewModel)
+
+        Column() {
+
+            GroupNameAndImage(modifier,viewModel.groupNameInput,viewModel::onGroupNameChange)
+            SelectedMember(modifier,selectedMemberState,viewModel::removeGroupMember)
+
+        }
+
+        CreateGroupState(createGroupState,navController)
+
         if(isGroupNameEmpty) {
             ShowToast(context = context, message = "Group name is  must  and image is option ")
             isGroupNameEmpty = false
         }
-        createGroupState.let { result ->
-            when (result) {
-                is Result.Loading->{
-                    ShowLoading(modifier = modifier)
-                }
-                is Result.Failure ->{
-                    ShowToast(context =context , message = result.exception.localizedMessage)
-                }
-                is Result.Success->{
-                    navigateToGroupScreen(navController)
-                }
-                else -> {}
-            }
-        }
+
     }
 
 }
+
+
 
 @Composable
-fun DetailsScreenContent(modifier:Modifier,viewModel: CreateGroupViewModel) {
-
-    Column() {
-         GroupNameAndImage(modifier,viewModel.groupNameInput,viewModel::onGroupNameChange)
-         SelectedMember(modifier = modifier, viewModel =viewModel )
+fun CreateGroupState(createGroupState: CreateGroupScreenState,navController: NavHostController) {
+    createGroupState.data?.let {
+      navigateToGroupScreen(navController)
     }
+    if(createGroupState.hasError){
+
+    }
+
 }
+
 
 @Composable
 fun GroupNameAndImage(
@@ -189,7 +188,7 @@ fun GroupDetailsPreview(){
    private  fun navigateToGroupScreen(navController: NavHostController) {
        navController.navigate(HomeNavigationItem.Groups.route) {
            popUpTo(CreateGroupScreen.GroupDetailsScreen.route) {
-               inclusive = true
+             //  inclusive = true
            }
        }
    }

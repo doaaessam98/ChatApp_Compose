@@ -1,48 +1,45 @@
-package com.example.chatapp.data.repository
+package com.example.chatapp.data.repository.userRepository
 
-import android.content.ContentValues.TAG
-import android.util.Log
-import com.example.chatapp.data.source.remote.IUserData
+import com.example.chatapp.data.source.remote.userData.IUserData
 import com.example.chatapp.model.Group
-import com.example.chatapp.model.GroupMember
 import com.example.chatapp.model.User
-import com.example.chatapp.utils.Result
+import com.example.chatapp.utils.Resource
 import com.example.chatapp.utils.await
 import com.google.firebase.auth.FirebaseUser
 import javax.inject.Inject
 
-class Repository @Inject constructor(private val  userData: IUserData) :IRepository{
+class Repository @Inject constructor(private val  userData: IUserData) : IRepository {
 
 
     override val currentUser: FirebaseUser?
         get() = userData.currentUser
-    override suspend fun login(email: String, password: String): Result<FirebaseUser> =userData.login(email,password)
+    override suspend fun login(email: String, password: String): Resource<FirebaseUser> =userData.login(email,password)
 
     override suspend fun signup(
         name: String,
         password: String,
         email: String
-    ): Result<FirebaseUser> =userData.signup(name,email,password)
+    ): Resource<FirebaseUser> =userData.signup(name,email,password)
 
     override fun logout() =userData.logout()
 
-    override suspend fun forgotPassword(email: String) :Result<Boolean> =userData.restPassword(email)
-    override suspend fun getCurrentUser():Result<User?> {
+    override suspend fun forgotPassword(email: String) :Resource<Boolean> =userData.restPassword(email)
+    override suspend fun getCurrentUser():Resource<User?> {
         return try {
 
              val result = userData.getCurrentUser().await()
 
              val user= result.toObjects(User::class.java)[0]
              // Constants.FRIENDS_LIST = user.friends as ArrayList<String>
-              Result.Success(user)
+              Resource.Success(user)
         }catch (e:Exception){
 
-            Result.Failure(e)
+            Resource.Error(e.localizedMessage)
         }
 
     }
 
-    override suspend fun searchForUser(searchString: String): Result<List<User>> {
+    override suspend fun searchForUser(searchString: String): Resource<List<User>> {
 
         return try {
             val users = userData.getUsers().await()
@@ -52,100 +49,92 @@ class Repository @Inject constructor(private val  userData: IUserData) :IReposit
 
             }
 
-                Result.Success(allUser)
+                Resource.Success(allUser)
 
 
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Failure(e)
+            Resource.Error(e.localizedMessage)
         }
     }
 
-    override suspend fun addFriend(currentUser: User,userFriendId: String):Result<Void?>{
+    override suspend fun addFriend(currentUser: User,userFriendId: String):Resource<Void?>{
         return  try {
 
             val result= userData.addFriend(currentUser,userFriendId)?.await()
 
             //  Constants.FRIENDS_LIST.add(userFriendId)
 
-              Result.Success(result)
+              Resource.Success(result)
 
         }catch (e:Exception){
-           Result.Failure(e)
+            Resource.Error(e.localizedMessage)
         }
 
     }
 
     override fun isFriendOf(currentUser: User, otherUser: User): Boolean =userData.isFriendOf(currentUser,otherUser)
-    override suspend fun getAllFriends(): Result<List<User>> {
+    override suspend fun getAllFriends(): Resource<List<User>> {
        return try {
                val currentUser = userData.getCurrentUser().await()
                val user= currentUser.toObjects(User::class.java)[0]
                if(user.friends.isNotEmpty()){
-                   Log.e(TAG, "getAllFriends: ${user.friends}", )
                val result = userData.getAllFriends(user.friends).await()
-                   Log.e(TAG, "getAllFriends: ${result.documents}", )
                    val friends = result.toObjects(User::class.java)
-                   Log.e(TAG, "getAllFriends: $friends", )
-                   Result.Success(friends)
+                   Resource.Success(friends)
                }else{
-                   Result.Success(listOf())
+                   Resource.Success(listOf())
                }
 
 
         }catch (e:Exception){
-           Log.e(TAG, "getAllFriends: $e", )
-           Result.Failure(e)
+           Resource.Error(e.localizedMessage)
         }
 
     }
 
-    override suspend fun removeFriend(friendId: String):Result<Void?> {
+    override suspend fun removeFriend(friendId: String):Resource<Void?> {
       return try {
           val currentUser = userData.getCurrentUser().await()
           val user = currentUser.toObjects(User::class.java)[0]
           val removeResult = userData.removeFriend(user, friendId)
-          Result.Success(removeResult?.result )
+          Resource.Success(removeResult?.result )
       }catch (e:Exception){
-         Result.Failure(e)
+          Resource.Error(e.localizedMessage)
       }
     }
 
-    override suspend fun getUsers(): Result<List<User>> {
+    override suspend fun getUsers(): Resource<List<User>> {
         return try {
             val result = userData.getUsers().await()
             val users = result.toObjects(User::class.java)
-            Result.Success(users)
+            Resource.Success(users)
         }catch (e:Exception){
-            Result.Failure(e)
+            Resource.Error(e.localizedMessage)
         }
     }
 
     override suspend fun createGroupChatRoom(
         groupName: String,
-        groupMembers: List<String>
-    ): Result<Void> {
+        userList: List<String>
+    ): Resource<Void> {
        return try {
-            val members = groupMembers.plus(currentUser!!.uid)
+            val members = userList.plus(currentUser!!.uid)
            val result = userData.createGroupChatRoom(groupName,members).await()
-           Result.Success(result)
+           Resource.Success(result)
        }catch (e:Exception){
-           Result.Failure(e)
+           Resource.Error(e.localizedMessage)
        }
     }
 
 
-    override suspend fun getGroupsOfUser(): Result<List<Group>> {
+    override suspend fun getGroupsOfUser(): Resource<List<Group>> {
         return  try {
              val result = userData.getGroupsOfUser(currentUser!!.uid).await()
-            Log.e(TAG, "getGroupsOfUser: ${result.size()}", )
-            Log.e(TAG, "getGroupsOfUser: ${result.isEmpty}", )
-
             val groups = result.toObjects(Group::class.java)
-            Log.e(TAG, "getGroupsOfUser: ${groups}", )
-             Result.Success(groups)
+             Resource.Success(groups)
         }catch (e:Exception){
-            Result.Failure(e)
+            Resource.Error(e.localizedMessage)
         }
     }
 }

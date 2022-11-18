@@ -1,8 +1,6 @@
 package com.example.chatapp.screen.fogetpassword
 
 import android.annotation.SuppressLint
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -22,12 +20,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.chatapp.R
-import com.example.chatapp.graphs.AuthScreen
 import com.example.chatapp.utils.CustomImage
-import com.example.chatapp.utils.ShowLoading
-import com.example.chatapp.utils.ShowToast
 import com.example.chatapp.utils.CustomOutLinedField
-import com.example.chatapp.utils.Result
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -92,28 +86,28 @@ fun ScreenContent(modifier: Modifier,viewModel:ForgetPasswordViewModel){
 fun RestPasswordState(modifier: Modifier, viewModel: ForgetPasswordViewModel?, navController: NavHostController) {
     val context = LocalContext.current
 
-    val state =viewModel?.restPasswordFlow?.collectAsState()
-    state?.value.let {result->
+//    val state =viewModel?.restPasswordFlow?.collectAsState()
+//    state?.value.let {result->
+//
+//                when(result){
+//                    is Resource.Loading ->{
+//
+//                        ShowLoading(modifier = modifier)
+//                    }
+//                    is Resource.Failure ->{
+//                        ShowToast(context,message = result.exception.message.toString())
+//
+//                    }
+//                    is Resource.Success -> {
+//                        Log.e(TAG, "restPasswordState: Success${result.result}", )
+//                        LaunchedEffect(Unit) {
+//                            navController.popBackStack()
+//                            navController.navigate(AuthScreen.Login.route)
+//                        }
+//                    }
+//                }
 
-                when(result){
-                    is Result.Loading ->{
-
-                        ShowLoading(modifier = modifier)
-                    }
-                    is Result.Failure ->{
-                        ShowToast(context,message = result.exception.message.toString())
-
-                    }
-                    is Result.Success -> {
-                        Log.e(TAG, "restPasswordState: Success${result.result}", )
-                        LaunchedEffect(Unit) {
-                            navController.popBackStack()
-                            navController.navigate(AuthScreen.Login.route)
-                        }
-                    }
-                }
-
-            }
+          //  }
 
 
 

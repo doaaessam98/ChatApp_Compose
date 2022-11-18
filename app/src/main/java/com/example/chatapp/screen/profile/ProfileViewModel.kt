@@ -1,7 +1,7 @@
 package com.example.chatapp.screen.profile
 
 import androidx.lifecycle.ViewModel
-import com.example.chatapp.data.repository.IRepository
+import com.example.chatapp.data.repository.userRepository.IRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

@@ -20,13 +20,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.chatapp.R
 import com.example.chatapp.graphs.CreateGroupScreen
+import com.example.chatapp.model.ScreenState
 import com.example.chatapp.model.User
 import com.example.chatapp.utils.*
 
@@ -37,17 +39,17 @@ fun SelectGroupMemberScreen(modifier: Modifier,navController: NavHostController,
 
 
     val  context = LocalContext.current
-    val selectedMember = viewModel.selectedMember.collectAsState().value.isNotEmpty()
+    val selectedMemberState = viewModel.selectedMember.collectAsState()
+    val usersState =viewModel.allUsers.collectAsState().value
     var isEmptyList by remember { mutableStateOf(false) }
 
 Scaffold (
 
     topBar = {CustomTopBar(modifier,"New Group","Add participants"){
-                 navController.popBackStack()
-              } },
+                 navController.popBackStack() } },
     floatingActionButton = { FloatingButton(modifier = modifier, icon = Icons.Default.ArrowForward)
     {
-        if(selectedMember)
+        if(selectedMemberState.value.isNotEmpty())
         {
             navController.navigate(CreateGroupScreen.GroupDetailsScreen.route)
         }else{
@@ -55,7 +57,13 @@ Scaffold (
         }
     } }
 ){
-    SelectGroupMemberScreenContent(modifier,viewModel)
+
+    Column(modifier = modifier) {
+        SelectedMember(modifier,selectedMemberState,viewModel::removeGroupMember)
+        AllUsers(modifier,usersState, onUserClicked =viewModel::onUserClicked,viewModel::isSelected)
+
+
+    }
 
      if(isEmptyList) {
          ShowToast(context = context, message = "At least 1 member must  be selected")
@@ -69,38 +77,17 @@ Scaffold (
 }
 
 
-
-
-
-
-
-
 @Composable
-fun SelectGroupMemberScreenContent(modifier: Modifier,viewModel: CreateGroupViewModel) {
-  Column(modifier = modifier) {
-      SelectedMember(modifier,viewModel)
-       AllUsers(modifier,viewModel)
+fun SelectedMember(modifier: Modifier, selectedMemberState: State<List<User>>,onRemoveClick: (User) -> Unit) {
 
-
-  }
-}
-
-
-@Composable
-fun SelectedMember(modifier: Modifier,viewModel: CreateGroupViewModel) {
-
-    val selectedMember = viewModel.selectedMember.collectAsState().value
-
-    if(selectedMember.isNotEmpty()){
+    if(selectedMemberState.value.isNotEmpty()){
         LazyRow{
-             items(selectedMember){ user->
-                 SelectedMemberContent(modifier = modifier, user = user,viewModel::removeGroupMember)
+             items(selectedMemberState.value){ user->
+                 SelectedMemberContent(modifier = modifier, user = user,onRemoveClick)
             }
    }
     }
-    else{
 
-    }
 
 }
 @Composable
@@ -158,51 +145,50 @@ fun SelectedMemberContent(
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun AllUsers(modifier: Modifier ,viewModel: CreateGroupViewModel) {
+fun AllUsers(modifier: Modifier,screenState: ScreenState,onUserClicked:(User)->Unit,isSelected:(User)->Boolean) {
     val  context = LocalContext.current
 
-    var users :List<User> = listOf()
-    val usersState =viewModel.allUsers.collectAsState().value
-    usersState.let {  response->
-     when(response){
-         is Result.Loading->{
-           ShowLoading(modifier = modifier)
-         }
-         is Result.Failure ->{
-           ShowToast(context =context , message = response.exception.localizedMessage)
-         }
-         is Result.Success->{
-             users= response.result
-         }
-         else -> {}
-     }
+    screenState.data?.let {alluser->
+        LazyColumn {
+            items(alluser){ user->
+               // val isSelected =  viewModel.selectedMember.collectAsState().value.contains(user)
+                AllUserContent(modifier,user,onUserClicked, isSelected)
+            }
+        }
+
     }
-     if(users.isNotEmpty() && usersState !=Result.Loading){
-     LazyColumn{
-         items(users){user->
-            val isSelected =  viewModel.selectedMember.collectAsState().value.contains(user)
-              AllUserContent(modifier,user,viewModel::onUserClicked, isSelected)
-         }
-     }
-     }else{
-          if(usersState !=Result.Loading){
-              //
-          }
-     }
+    if (screenState.hasError) {
+        androidx.compose.material.Text(
+            text = screenState.errorMessage ?: "Something went wrong",
+            style = TextStyle(
+                color = Color.DarkGray,
+                fontSize = 40.sp,
+                textAlign = TextAlign.Center
+            )
+        )
+    }
+
+    if (screenState.isLoading) {
+       ShowLoading(modifier = modifier)
+
+    }
+
+
 }
 
 @Composable
 fun AllUserContent(
     modifier: Modifier,
-    user: User,onClick:(User)->Unit,
-    isSelected:Boolean
+    user: User,
+    onUserClick:(User)->Unit,
+    isSelected:(User)->Boolean
 ){
 
     Card(
         modifier
             .fillMaxWidth()
             .clickable {
-                onClick.invoke(user)
+                onUserClick.invoke(user)
 
             }
     ) {
@@ -220,7 +206,7 @@ fun AllUserContent(
                         ProfilePicture(picture = null, "")
                     }
 
-                  if(isSelected){
+                  if(isSelected.invoke(user)){
                       Icon(
 
                           imageVector = Icons.Rounded.Done,

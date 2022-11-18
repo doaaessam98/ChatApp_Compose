@@ -5,15 +5,13 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chatapp.R
-import com.example.chatapp.data.repository.IRepository
+import com.example.chatapp.data.repository.userRepository.IRepository
+import com.example.chatapp.model.AuthScreenState
 import com.example.chatapp.model.InputField
-import com.example.chatapp.utils.Result
 import com.example.chatapp.utils.isEmail
-import com.example.chatapp.utils.isPassword
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -25,9 +23,9 @@ class LoginViewModel @Inject constructor(
 ) :ViewModel(){
 
 
-    private val _loginFlow = MutableStateFlow<Result<FirebaseUser>?> (Result.Idle)
+    private val _loginFlow = MutableStateFlow(AuthScreenState())
 
-    val loginFlow : StateFlow<Result<FirebaseUser>?> = _loginFlow
+    val loginFlow : StateFlow<AuthScreenState> = _loginFlow
 
     private val _emailInput = MutableStateFlow(InputField())
     val emailInput: StateFlow<InputField> = _emailInput
@@ -75,12 +73,9 @@ class LoginViewModel @Inject constructor(
                 else -> {
                     _isButtonEnable.value=false
                     viewModelScope.launch {
-                        _loginFlow.emit(Result.Loading)
                         val result = repository.login(email, password)
-                        _loginFlow.emit(result)
-                        _isButtonEnable.emit(true)
-                        delay(300)
-                        _loginFlow.emit(Result.Idle)
+
+
                     }
                 }
 

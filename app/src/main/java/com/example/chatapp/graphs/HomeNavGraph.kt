@@ -1,28 +1,28 @@
 package com.example.chatapp.graphs
 
-import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.chatapp.R
 import com.example.chatapp.screen.chats.ChatsScreen
 import com.example.chatapp.screen.friends.FriendsScreen
 import com.example.chatapp.screen.groups.CreateGroupViewModel
+import com.example.chatapp.screen.groups.GroupDetailsScreen
 import com.example.chatapp.screen.groups.GroupsScreen
+import com.example.chatapp.screen.groups.SelectGroupMemberScreen
 import com.example.chatapp.screen.profile.ProfileScreen
 import com.example.chatapp.screen.search.SearchScreen
-import com.example.chatapp.screen.signup.SignupViewModel
 
 @Composable
 fun HomeNavGraph(modifier:Modifier,navController:NavHostController){
     val viewModel :CreateGroupViewModel = hiltViewModel()
+    val groupNavController:NavHostController = rememberNavController()
 
     NavHost(navController = navController,
         route=Graph.HOME,
@@ -37,13 +37,23 @@ fun HomeNavGraph(modifier:Modifier,navController:NavHostController){
             FriendsScreen(modifier = modifier, navController = navController)
         }
 
-//        composable(route= HomeNavigationItem.Groups.route){
-//            GroupsScreen(modifier = modifier, navController = navController)
-//        }
-        CreateGroupNavGraph(modifier = modifier, navController = navController,viewModel)
+        composable(route= HomeNavigationItem.Groups.route){
+            GroupsScreen(modifier = modifier, navController = navController)
+        }
+   ///     CreateGroupNavGraph(modifier = modifier, navController = groupNavController,viewModel)
 
-
-
+        composable(TopBarScreen.Search.route){
+            SearchScreen(modifier = modifier, navController = navController)
+        }
+        composable(TopBarScreen.Profile.route){
+            ProfileScreen(navController)
+        }
+        composable(route= CreateGroupScreen.SelectMemberScreen.route){
+            SelectGroupMemberScreen(modifier,navController = navController,viewModel)
+        }
+        composable(route= CreateGroupScreen.GroupDetailsScreen.route){
+            GroupDetailsScreen(modifier,navController = navController,viewModel)
+        }
 
     }
 }
